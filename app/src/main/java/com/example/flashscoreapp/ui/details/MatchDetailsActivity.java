@@ -82,20 +82,24 @@ public class MatchDetailsActivity extends AppCompatActivity {
     private void observeViewModel() {
         viewModel.getMatchDetails().observe(this, details -> {
             if (details != null) {
-                // Cập nhật thống kê
+                // --- CẬP NHẬT CÁCH HIỂN THỊ THỐNG KÊ ---
                 StringBuilder statsBuilder = new StringBuilder();
-                for (MatchStatistic stat : details.getStatistics()) {
-                    statsBuilder
-                            .append(stat.getType())
-                            .append(": ")
-                            .append(stat.getHomeValue())
-                            .append(" - ")
-                            .append(stat.getAwayValue())
-                            .append("\n");
+                if (details.getStatistics() != null && !details.getStatistics().isEmpty()) {
+                    for (MatchStatistic stat : details.getStatistics()) {
+                        statsBuilder
+                                .append(stat.getType())
+                                .append(":  ") // Thêm khoảng trắng
+                                .append(stat.getHomeValue())
+                                .append(" - ")
+                                .append(stat.getAwayValue())
+                                .append("\n\n"); // Thêm 2 lần xuống dòng cho thoáng
+                    }
+                    textViewStatistics.setText(statsBuilder.toString());
+                } else {
+                    textViewStatistics.setText("Không có dữ liệu thống kê.");
                 }
-                textViewStatistics.setText(statsBuilder.toString());
 
-                // Cập nhật danh sách sự kiện
+                // Cập nhật danh sách sự kiện (giữ nguyên)
                 if (details.getEvents() != null) {
                     eventAdapter.setEvents(details.getEvents());
                 }

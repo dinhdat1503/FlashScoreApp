@@ -15,4 +15,11 @@ public class MatchStatistic {
     public String getType() { return type; }
     public String getHomeValue() { return homeValue; }
     public String getAwayValue() { return awayValue; }
+    public void setAwayValue(String awayValue) { this.awayValue = awayValue; }
+
+    public MatchStatistic(String type, String homeValue, String awayValue) {
+        this.type = type;
+        this.homeValue = homeValue;
+        this.awayValue = awayValue;
+    }
 }

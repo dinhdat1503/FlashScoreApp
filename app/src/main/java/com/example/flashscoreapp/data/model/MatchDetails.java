@@ -14,6 +14,13 @@ public class MatchDetails {
     private List<MatchEvent> events;
 
     public int getMatchId() { return matchId; }
+    public MatchDetails(int matchId, List<MatchStatistic> statistics, List<MatchEvent> events) {
+        this.matchId = matchId;
+        this.statistics = statistics;
+        this.events = events;
+    }
     public List<MatchStatistic> getStatistics() { return statistics; }
     public List<MatchEvent> getEvents() { return events; }
+    public void setEvents(List<MatchEvent> events) { this.events = events; }
+    public void setStatistics(List<MatchStatistic> statistics) { this.statistics = statistics; }
 }

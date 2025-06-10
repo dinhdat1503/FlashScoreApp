@@ -13,7 +13,14 @@ public class MatchEvent {
     private String player;
 
     @SerializedName("type")
-    private String type; // "Bàn thắng", "Thẻ vàng", etc.
+    private String type;
+
+    public MatchEvent(int minute, String team, String player, String type) {
+        this.minute = minute;
+        this.team = team;
+        this.player = player;
+        this.type = type;
+    }
 
     public int getMinute() { return minute; }
     public String getTeam() { return team; }
