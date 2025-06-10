@@ -1,0 +1,17 @@
+{
+  "matchId": 101,
+  "statistics": [
+    { "type": "Sút", "home": "15", "away": "8" },
+    { "type": "Sút trúng đích", "home": "7", "away": "2" },
+    { "type": "Kiểm soát bóng", "home": "62%", "away": "38%" },
+    { "type": "Phạt góc", "home": "9", "away": "4" },
+    { "type": "Việt vị", "home": "1", "away": "3" },
+    { "type": "Thẻ vàng", "home": "2", "away": "3" },
+    { "type": "Thẻ đỏ", "home": "0", "away": "0" }
+  ],
+  "events": [
+    { "minute": 25, "team": "home", "player": "B. Fernandes", "type": "Thẻ vàng" },
+    { "minute": 48, "team": "away", "player": "V. van Dijk", "type": "Thẻ vàng" },
+    { "minute": 67, "team": "home", "player": "M. Rashford", "type": "Bàn thắng" }
+  ]
+}

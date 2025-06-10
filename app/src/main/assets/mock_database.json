@@ -1,0 +1,75 @@
+{
+  "2024-06-01": [
+    {
+      "matchId": 301,
+      "league": { "name": "UEFA Champions League - Chung kết" },
+      "homeTeam": { "name": "B. Dortmund", "logoUrl": "" },
+      "awayTeam": { "name": "Real Madrid", "logoUrl": "" },
+      "matchTime": 1717272000000,
+      "status": "FT",
+      "score": { "home": 0, "away": 2 }
+    }
+  ],
+  "2024-06-04": [
+    {
+      "matchId": 303,
+      "league": { "name": "Giao hữu Quốc tế" },
+      "homeTeam": { "name": "Bồ Đào Nha", "logoUrl": "" },
+      "awayTeam": { "name": "Phần Lan", "logoUrl": "" },
+      "matchTime": 1717530600000,
+      "status": "FT",
+      "score": { "home": 4, "away": 2 }
+    }
+  ],
+  "2025-06-06": [
+    {
+      "matchId": 401,
+      "league": { "name": "Premier League" },
+      "homeTeam": { "name": "Man City", "logoUrl": "" },
+      "awayTeam": { "name": "Aston Villa", "logoUrl": "" },
+      "matchTime": 1749241500000,
+      "status": "FT",
+      "score": { "home": 3, "away": 1 }
+    }
+  ],
+  "2025-06-07": [
+    {
+      "matchId": 402,
+      "league": { "name": "La Liga" },
+      "homeTeam": { "name": "Atl. Madrid", "logoUrl": "" },
+      "awayTeam": { "name": "Sevilla", "logoUrl": "" },
+      "matchTime": 1749392400000,
+      "status": "LIVE",
+      "score": { "home": 1, "away": 1 }
+    },
+    {
+      "matchId": 403,
+      "league": { "name": "Serie A" },
+      "homeTeam": { "name": "AC Milan", "logoUrl": "" },
+      "awayTeam": { "name": "AS Roma", "logoUrl": "" },
+      "matchTime": 1749489600000,
+      "status": "NS",
+      "score": { "home": 0, "away": 0 }
+    }
+  ],
+  "2025-06-08": [
+    {
+      "matchId": 404,
+      "league": { "name": "Bundesliga" },
+      "homeTeam": { "name": "Bayern Munich", "logoUrl": "" },
+      "awayTeam": { "name": "RB Leipzig", "logoUrl": "" },
+      "matchTime": 1749403200000,
+      "status": "NS",
+      "score": { "home": 0, "away": 0 }
+    },
+    {
+      "matchId": 405,
+      "league": { "name": "Ligue 1" },
+      "homeTeam": { "name": "PSG", "logoUrl": "" },
+      "awayTeam": { "name": "Monaco", "logoUrl": "" },
+      "matchTime": 1749496800000,
+      "status": "NS",
+      "score": { "home": 0, "away": 0 }
+    }
+  ]
+}

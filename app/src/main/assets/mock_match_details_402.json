@@ -1,0 +1,16 @@
+{
+  "matchId": 402,
+  "statistics": [
+    { "type": "Sút", "home": "12", "away": "9" },
+    { "type": "Sút trúng đích", "home": "5", "away": "4" },
+    { "type": "Kiểm soát bóng", "home": "55%", "away": "45%" },
+    { "type": "Phạt góc", "home": "6", "away": "3" },
+    { "type": "Việt vị", "home": "2", "away": "1" },
+    { "type": "Thẻ vàng", "home": "1", "away": "2" }
+  ],
+  "events": [
+    { "minute": 28, "team": "away", "player": "Y. En-Nesyri", "type": "Bàn thắng" },
+    { "minute": 45, "team": "home", "player": "Koke", "type": "Thẻ vàng" },
+    { "minute": 59, "team": "home", "player": "A. Griezmann", "type": "Bàn thắng" }
+  ]
+}
