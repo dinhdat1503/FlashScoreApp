@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import com.bumptech.glide.Glide;
+import android.widget.ImageView;
 
 public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.MatchViewHolder> {
 
@@ -24,7 +26,7 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.MatchViewHol
     }
 
     private List<Match> matches = new ArrayList<>();
-    private OnItemClickListener listener; // The listener instance
+    private OnItemClickListener listener;
 
     public void setOnItemClickListener(OnItemClickListener listener) {
         this.listener = listener;
@@ -58,6 +60,7 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.MatchViewHol
     // The 'static' keyword is removed
     class MatchViewHolder extends RecyclerView.ViewHolder {
         private final TextView textViewStatus, textViewLeague, textViewHomeTeam, textViewAwayTeam, textViewScore;
+        private final ImageView imageViewHomeLogo, imageViewAwayLogo;
 
         public MatchViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -66,7 +69,8 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.MatchViewHol
             textViewHomeTeam = itemView.findViewById(R.id.text_view_home_team);
             textViewAwayTeam = itemView.findViewById(R.id.text_view_away_team);
             textViewScore = itemView.findViewById(R.id.text_view_score);
-
+            imageViewHomeLogo = itemView.findViewById(R.id.image_view_home_logo);
+            imageViewAwayLogo = itemView.findViewById(R.id.image_view_away_logo);
             itemView.setOnClickListener(v -> {
                 int position = getAdapterPosition();
                 // This now works because the non-static inner class can access the outer class's 'listener'
@@ -77,13 +81,12 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.MatchViewHol
         }
 
         public void bind(Match match) {
-            // ... bind logic remains the same
             textViewStatus.setText(match.getStatus());
             textViewLeague.setText(match.getLeague().getName());
             textViewHomeTeam.setText(match.getHomeTeam().getName());
             textViewAwayTeam.setText(match.getAwayTeam().getName());
 
-            if (match.getStatus().equals("NS")) { // Not Started
+            if (match.getStatus().equals("NS")) {
                 SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
                 sdf.setTimeZone(java.util.TimeZone.getTimeZone("Asia/Ho_Chi_Minh")); // Hiển thị giờ Việt Nam
                 textViewScore.setText(sdf.format(new Date(match.getMatchTime())));
@@ -92,6 +95,19 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.MatchViewHol
                 String scoreText = score.getHome() + " - " + score.getAway();
                 textViewScore.setText(scoreText);
             }
+
+            Glide.with(itemView.getContext())
+                    .load(match.getHomeTeam().getLogoUrl())
+                    .placeholder(R.drawable.ic_leagues_24)
+                    .error(R.drawable.ic_settings_24)
+                    .into(imageViewHomeLogo);
+
+            // Tải logo đội khách
+            Glide.with(itemView.getContext())
+                    .load(match.getAwayTeam().getLogoUrl())
+                    .placeholder(R.drawable.ic_leagues_24)
+                    .error(R.drawable.ic_settings_24)
+                    .into(imageViewAwayLogo);
         }
     }
 }

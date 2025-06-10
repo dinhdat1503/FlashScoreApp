@@ -35,18 +35,26 @@
             app:layout_constraintTop_toTopOf="@id/text_view_status"
             app:layout_constraintBottom_toBottomOf="@id/text_view_status"
             tools:text="Premier League"/>
-
+        <ImageView
+            android:id="@+id/image_view_home_logo"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/text_view_status"
+            tools:src="@tools:sample/avatars" />
         <TextView
             android:id="@+id/text_view_home_team"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:gravity="center"
+            android:layout_marginStart="8dp"
+            android:gravity="start"
             android:textSize="16sp"
             android:textStyle="bold"
+            app:layout_constraintStart_toEndOf="@id/image_view_home_logo"
             app:layout_constraintEnd_toStartOf="@+id/text_view_score"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/text_view_status"
+            app:layout_constraintTop_toTopOf="@id/image_view_home_logo"
+            app:layout_constraintBottom_toBottomOf="@id/image_view_home_logo"
             tools:text="Man United" />
 
         <TextView
@@ -61,18 +69,26 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/text_view_home_team"
             tools:text="1 - 0" />
-
+        <ImageView
+            android:id="@+id/image_view_away_logo"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/text_view_status"
+            tools:src="@tools:sample/avatars" />
         <TextView
             android:id="@+id/text_view_away_team"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:gravity="center"
+            android:layout_marginEnd="8dp"
+            android:gravity="end"
             android:textSize="16sp"
             android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/image_view_away_logo"
             app:layout_constraintStart_toEndOf="@+id/text_view_score"
-            app:layout_constraintTop_toBottomOf="@id/text_view_status"
+            app:layout_constraintTop_toTopOf="@id/image_view_away_logo"
+            app:layout_constraintBottom_toBottomOf="@id/image_view_away_logo"
             tools:text="Liverpool" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

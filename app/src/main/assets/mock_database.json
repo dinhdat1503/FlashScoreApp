@@ -25,8 +25,8 @@
     {
       "matchId": 401,
       "league": { "name": "Premier League" },
-      "homeTeam": { "name": "Man City", "logoUrl": "" },
-      "awayTeam": { "name": "Aston Villa", "logoUrl": "" },
+      "homeTeam": { "name": "Man City", "logoUrl": "https://brandlogos.net/wp-content/uploads/2017/05/Manchester-City-FC-logo-1-512x512.png" },
+      "awayTeam": { "name": "Aston Villa", "logoUrl": "https://brandlogos.net/wp-content/uploads/2025/02/aston_villa_fc-logo_brandlogos.net_9duqy.png" },
       "matchTime": 1749241500000,
       "status": "FT",
       "score": { "home": 3, "away": 1 }
