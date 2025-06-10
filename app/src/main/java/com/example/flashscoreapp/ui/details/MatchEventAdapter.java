@@ -12,6 +12,7 @@ import com.example.flashscoreapp.R;
 import com.example.flashscoreapp.data.model.MatchEvent;
 import java.util.ArrayList;
 import java.util.List;
+import android.view.View;
 
 public class MatchEventAdapter extends RecyclerView.Adapter<MatchEventAdapter.EventViewHolder> {
 
@@ -58,12 +59,21 @@ public class MatchEventAdapter extends RecyclerView.Adapter<MatchEventAdapter.Ev
             String playerText = event.getPlayer() + " (" + event.getType() + ")";
             textPlayer.setText(playerText);
 
-            // TODO: Thiết lập icon dựa trên loại sự kiện
-            // if (event.getType().equals("Bàn thắng")) {
-            //     imageIcon.setImageResource(R.drawable.ic_goal);
-            // } else if (event.getType().equals("Thẻ vàng")) {
-            //     imageIcon.setImageResource(R.drawable.ic_yellow_card);
-            // }
+            // Hiển thị icon mặc định
+            imageIcon.setVisibility(View.VISIBLE);
+
+            // Kiểm tra loại sự kiện và đặt icon tương ứng
+            String eventType = event.getType();
+            if ("Goal".equalsIgnoreCase(eventType)) {
+                imageIcon.setImageResource(R.drawable.ic_football_goal);
+            } else if ("Yellow Card".equalsIgnoreCase(eventType)) {
+                imageIcon.setImageResource(R.drawable.ic_yellow_card);
+            } else if ("Red Card".equalsIgnoreCase(eventType)) {
+                imageIcon.setImageResource(R.drawable.ic_red_card);
+            } else {
+                // Với các sự kiện khác (như thay người "subst"), ẩn icon đi
+                imageIcon.setVisibility(View.INVISIBLE);
+            }
         }
     }
 }
