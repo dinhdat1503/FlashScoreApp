@@ -11,6 +11,12 @@ public class Score implements Serializable {
     @SerializedName("away")
     private int away;
 
+    // --- CONSTRUCTOR MỚI ---
+    public Score(int home, int away) {
+        this.home = home;
+        this.away = away;
+    }
+
     public int getHome() {
         return home;
     }

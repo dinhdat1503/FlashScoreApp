@@ -11,6 +11,11 @@ public class Team implements Serializable {
     @SerializedName("logoUrl")
     private String logoUrl;
 
+    public Team(String name, String logoUrl) {
+        this.name = name;
+        this.logoUrl = logoUrl;
+    }
+
     public String getName() {
         return name;
     }

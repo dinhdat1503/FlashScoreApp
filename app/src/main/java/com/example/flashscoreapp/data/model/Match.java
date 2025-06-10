@@ -25,6 +25,17 @@ public class Match implements Serializable {
     @SerializedName("score")
     private Score score;
 
+    // --- CONSTRUCTOR MỚI ---
+    public Match(int matchId, League league, Team homeTeam, Team awayTeam, long matchTime, String status, Score score) {
+        this.matchId = matchId;
+        this.league = league;
+        this.homeTeam = homeTeam;
+        this.awayTeam = awayTeam;
+        this.matchTime = matchTime;
+        this.status = status;
+        this.score = score;
+    }
+
     // Getters for all fields
     public int getMatchId() { return matchId; }
     public League getLeague() { return league; }

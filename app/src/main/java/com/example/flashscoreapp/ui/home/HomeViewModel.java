@@ -1,9 +1,10 @@
 package com.example.flashscoreapp.ui.home;
 
 import android.app.Application;
+import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.MediatorLiveData; // THAY ĐỔI QUAN TRỌNG: Import lớp MediatorLiveData
 import com.example.flashscoreapp.data.model.Match;
 import com.example.flashscoreapp.data.repository.MatchRepository;
 import java.util.List;
@@ -11,21 +12,28 @@ import java.util.List;
 public class HomeViewModel extends AndroidViewModel {
 
     private final MatchRepository matchRepository;
-    private final MutableLiveData<List<Match>> matches = new MutableLiveData<>();
+    private final MediatorLiveData<List<Match>> matches = new MediatorLiveData<>();
+    private LiveData<List<Match>> currentDataSource;
 
-    public HomeViewModel(Application application) {
+    public HomeViewModel(@NonNull Application application) {
         super(application);
         this.matchRepository = new MatchRepository();
     }
 
-    // Phương thức này giờ sẽ hoạt động đúng như mong đợi
     public void fetchMatchesForDate(String date) {
-        // Repository sẽ xử lý việc tìm đúng ngày, ViewModel không cần quan tâm
-        matchRepository.getMatchesByDateFromMock(getApplication().getApplicationContext(), date).observeForever(matchList -> {
+        LiveData<List<Match>> newDataSource = matchRepository.getMatchesByDateFromApi(date);
+
+        if (currentDataSource != null) {
+            matches.removeSource(currentDataSource);
+        }
+
+        currentDataSource = newDataSource;
+        matches.addSource(currentDataSource, matchList -> {
             matches.setValue(matchList);
         });
     }
 
+    // Trả về LiveData, không thay đổi
     public LiveData<List<Match>> getMatches() {
         return matches;
     }
