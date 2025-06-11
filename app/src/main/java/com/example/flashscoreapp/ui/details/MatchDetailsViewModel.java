@@ -14,9 +14,8 @@ public class MatchDetailsViewModel extends AndroidViewModel {
 
     public MatchDetailsViewModel(@NonNull Application application, int matchId) {
         super(application);
-        repository = new MatchRepository();
-        // --- THAY ĐỔI DUY NHẤT TẠI ĐÂY ---
-        // Gọi phương thức mới để lấy dữ liệu từ API thay vì từ mock
+        // Sửa lại dòng này để truyền application vào constructor của Repository
+        repository = new MatchRepository(application);
         matchDetails = repository.getMatchDetailsFromApi(matchId);
     }
 

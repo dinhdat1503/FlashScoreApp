@@ -1,6 +1,6 @@
 package com.example.flashscoreapp.data.repository;
 
-// ... import các lớp cần thiết ...
+import android.app.Application;
 import android.content.Context;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -8,8 +8,11 @@ import androidx.lifecycle.MutableLiveData;
 import com.example.flashscoreapp.data.api.ApiService;
 import com.example.flashscoreapp.data.api.RetrofitClient;
 import com.example.flashscoreapp.data.model.ApiEvent;
+import com.example.flashscoreapp.data.model.ApiLeagueData;
+import com.example.flashscoreapp.data.model.ApiLeaguesResponse;
 import com.example.flashscoreapp.data.model.ApiResponse;
 import com.example.flashscoreapp.data.model.ApiMatch;
+import com.example.flashscoreapp.data.model.ApiStandingsResponse;
 import com.example.flashscoreapp.data.model.ApiStatisticItem;
 import com.example.flashscoreapp.data.model.ApiStatisticsResponse;
 import com.example.flashscoreapp.data.model.ApiTeamStatistics;
@@ -17,6 +20,7 @@ import com.example.flashscoreapp.data.model.League;
 import com.example.flashscoreapp.data.model.Match;
 import com.example.flashscoreapp.data.model.MatchDetails;
 import com.example.flashscoreapp.data.model.Score;
+import com.example.flashscoreapp.data.model.StandingItem;
 import com.example.flashscoreapp.data.model.Team;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -40,15 +44,40 @@ import retrofit2.Response;
 import com.example.flashscoreapp.data.model.MatchDetails;
 import com.example.flashscoreapp.data.model.MatchEvent;
 import com.example.flashscoreapp.data.model.MatchStatistic;
+import com.example.flashscoreapp.data.db.AppDatabase;
+import com.example.flashscoreapp.data.db.MatchDao;
+import com.example.flashscoreapp.data.model.FavoriteMatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MatchRepository {
-
     private final ApiService apiService;
+    private final MatchDao matchDao;
+    private final ExecutorService executorService;
     private final String API_KEY = "5ed9571131c54363cb3e39780ff22892";
     private final String API_HOST = "v3.football.api-sports.io";
 
-    public MatchRepository() {
+    public MatchRepository(Application application) {
         this.apiService = RetrofitClient.getApiService();
+        AppDatabase db = AppDatabase.getDatabase(application); // Lấy instance của DB
+        this.matchDao = db.matchDao(); // Lấy DAO từ DB
+        this.executorService = Executors.newSingleThreadExecutor(); // Tạo một thread để xử lý tác vụ DB
+    }
+
+    public LiveData<List<Match>> getAllFavoriteMatches() {
+        return matchDao.getAllFavoriteMatches();
+    }
+
+    public void addFavorite(Match match) {
+        // Truyền thêm match.getMatchTime() vào
+        FavoriteMatch favoriteMatch = new FavoriteMatch(match.getMatchId(), match.getMatchTime(), match);
+        executorService.execute(() -> matchDao.addFavorite(favoriteMatch));
+    }
+
+    public void removeFavorite(Match match) {
+        // Truyền thêm match.getMatchTime() vào
+        FavoriteMatch favoriteMatch = new FavoriteMatch(match.getMatchId(), match.getMatchTime(), match);
+        executorService.execute(() -> matchDao.removeFavorite(favoriteMatch));
     }
     public LiveData<MatchDetails> getMatchDetailsFromApi(int matchId) {
         final MutableLiveData<MatchDetails> detailsData = new MutableLiveData<>();
@@ -274,6 +303,61 @@ public class MatchRepository {
             return null;
         }
         return json;
+    }
+
+    public LiveData<List<League>> getLeagues() {
+        final MutableLiveData<List<League>> data = new MutableLiveData<>();
+
+        apiService.getLeagues(API_KEY, API_HOST).enqueue(new Callback<ApiLeaguesResponse>() {
+            @Override
+            public void onResponse(Call<ApiLeaguesResponse> call, Response<ApiLeaguesResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<League> leagues = new ArrayList<>();
+                    for (ApiLeagueData leagueData : response.body().getResponse()) {
+                        leagues.add(leagueData.getLeague());
+                    }
+                    data.postValue(leagues);
+                } else {
+                    android.util.Log.e("MatchRepository", "Leagues API Error: " + response.code());
+                    data.postValue(null);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiLeaguesResponse> call, Throwable t) {
+                android.util.Log.e("MatchRepository", "Leagues Network Failure: " + t.getMessage());
+                data.postValue(null);
+            }
+        });
+        return data;
+    }
+
+    public LiveData<List<StandingItem>> getStandings(int leagueId, int season) {
+        final MutableLiveData<List<StandingItem>> data = new MutableLiveData<>();
+
+        apiService.getStandings(leagueId, season, API_KEY, API_HOST).enqueue(new Callback<ApiStandingsResponse>() {
+            @Override
+            public void onResponse(Call<ApiStandingsResponse> call, Response<ApiStandingsResponse> response) {
+                if (response.isSuccessful() && response.body() != null
+                        && !response.body().getResponse().isEmpty()) {
+
+                    // API trả về cấu trúc list trong list, ta lấy ra bảng xếp hạng đầu tiên
+                    List<StandingItem> standings = response.body().getResponse().get(0).getLeague().getStandings().get(0);
+                    data.postValue(standings);
+                } else {
+                    android.util.Log.e("MatchRepository", "Standings API Error: " + response.code());
+                    data.postValue(null);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiStandingsResponse> call, Throwable t) {
+                android.util.Log.e("MatchRepository", "Standings Network Failure: " + t.getMessage());
+                data.postValue(null);
+            }
+        });
+
+        return data;
     }
 
 }

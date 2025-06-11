@@ -25,6 +25,7 @@
         </activity>
         <activity android:name=".ui.details.MatchDetailsActivity"
             android:parentActivityName=".ui.MainActivity"/>
+
     </application>
 
 </manifest>

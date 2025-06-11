@@ -3,6 +3,7 @@ package com.example.flashscoreapp.ui.home;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,10 +18,13 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.flashscoreapp.R;
 import com.example.flashscoreapp.ui.details.MatchDetailsActivity;
+import com.example.flashscoreapp.data.model.Match;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class HomeFragment extends Fragment {
 
@@ -95,7 +99,7 @@ public class HomeFragment extends Fragment {
             DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), dateSetListener, year, month, day);
             datePickerDialog.show();
         });
-        // =============================================================
+
     }
 
     private void updateDateAndFetchMatches() {
@@ -110,12 +114,28 @@ public class HomeFragment extends Fragment {
     private void setupRecyclerView(View view) {
         recyclerViewMatches = view.findViewById(R.id.recycler_view_matches);
         matchAdapter = new MatchAdapter();
-        matchAdapter.setOnItemClickListener(match -> {
-            Intent intent = new Intent(getActivity(), MatchDetailsActivity.class);
-            // Thay vì chỉ gửi ID, chúng ta gửi cả đối tượng Match
-            intent.putExtra("EXTRA_MATCH", match);
-            startActivity(intent);
+
+        // Sử dụng một lớp ẩn danh (anonymous inner class) đầy đủ vì interface có 2 phương thức
+        matchAdapter.setOnItemClickListener(new MatchAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(Match match) {
+                // Đoạn code này bây giờ sẽ hoàn toàn chính xác
+                Intent intent = new Intent(getActivity(), MatchDetailsActivity.class);
+                // "match" ở đây là một đối tượng Match, không phải lambda
+                intent.putExtra("EXTRA_MATCH", match);
+                startActivity(intent);
+            }
+
+            @Override
+            public void onFavoriteClick(Match match, boolean isFavorite) {
+                if (isFavorite) {
+                    homeViewModel.removeFavorite(match);
+                } else {
+                    homeViewModel.addFavorite(match);
+                }
+            }
         });
+
         recyclerViewMatches.setAdapter(matchAdapter);
     }
 
@@ -125,6 +145,9 @@ public class HomeFragment extends Fragment {
         textNoMatches.setVisibility(View.GONE);
 
         homeViewModel.getMatches().observe(getViewLifecycleOwner(), matches -> {
+            // --- THÊM LOG TẠI ĐÂY ---
+            Log.d("FragmentLog", "Observer in Fragment triggered. Found " + (matches != null ? matches.size() : "null") + " matches.");
+
             progressBar.setVisibility(View.GONE);
             if (matches != null && !matches.isEmpty()) {
                 recyclerViewMatches.setVisibility(View.VISIBLE);
@@ -133,6 +156,18 @@ public class HomeFragment extends Fragment {
             } else {
                 recyclerViewMatches.setVisibility(View.GONE);
                 textNoMatches.setVisibility(View.VISIBLE);
+            }
+        });
+
+        homeViewModel.getFavoriteMatches().observe(getViewLifecycleOwner(), favoriteMatches -> {
+            // "favoriteMatches" bây giờ là một List<Match>
+            if (favoriteMatches != null) {
+                // Sửa lại logic để lấy matchId từ đối tượng Match
+                Set<Integer> favoriteIds = favoriteMatches.stream()
+                        .map(Match::getMatchId) // THAY ĐỔI TỪ FavoriteMatch::getMatchId
+                        .collect(Collectors.toSet());
+
+                matchAdapter.setFavoriteMatchIds(favoriteIds);
             }
         });
     }

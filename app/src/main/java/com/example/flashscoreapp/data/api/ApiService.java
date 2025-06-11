@@ -1,6 +1,8 @@
 package com.example.flashscoreapp.data.api;
 
+import com.example.flashscoreapp.data.model.ApiLeaguesResponse;
 import com.example.flashscoreapp.data.model.ApiResponse;
+import com.example.flashscoreapp.data.model.ApiStandingsResponse;
 import com.example.flashscoreapp.data.model.ApiStatisticsResponse;
 
 import retrofit2.Call;
@@ -32,4 +34,19 @@ public interface ApiService {
             @Header("x-rapidapi-key") String apiKey,
             @Header("x-rapidapi-host") String apiHost
     );
+
+    @GET("leagues")
+    Call<ApiLeaguesResponse> getLeagues(
+            @Header("x-rapidapi-key") String apiKey,
+            @Header("x-rapidapi-host") String apiHost
+    );
+
+    @GET("standings")
+    Call<ApiStandingsResponse> getStandings(
+            @Query("league") int leagueId,
+            @Query("season") int season,
+            @Header("x-rapidapi-key") String apiKey,
+            @Header("x-rapidapi-host") String apiHost
+    );
+
 }
