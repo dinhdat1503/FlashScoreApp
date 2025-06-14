@@ -54,7 +54,7 @@ public class MatchRepository {
     private final ApiService apiService;
     private final MatchDao matchDao;
     private final ExecutorService executorService;
-    private final String API_KEY = "5ed9571131c54363cb3e39780ff22892";
+    private final String API_KEY = "e9f057fd50b01827627c9c4ac28f2e44";
     private final String API_HOST = "v3.football.api-sports.io";
 
     public MatchRepository(Application application) {

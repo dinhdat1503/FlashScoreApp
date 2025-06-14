@@ -17,7 +17,7 @@
             android:layout_height="?attr/actionBarSize"
             app:title="Today's Matches"
             app:titleTextColor="@color/white"
-            android:background="?attr/colorPrimary"/>
+            android:background="@color/backgroudTop"/>
 
     </com.google.android.material.appbar.AppBarLayout>
 

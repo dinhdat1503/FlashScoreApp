@@ -4,4 +4,6 @@
     <color name="white">#FFFFFFFF</color>
     <color name="colorPrimary">#5E35B1</color> <color name="colorPrimaryVariant">#4527A0</color>
     <color name="colorAccent">#5E35B1</color>
+    <color name="selected_date_color">#ca0139</color>
+    <color name="backgroudTop">#031320</color>
 </resources>

@@ -25,17 +25,21 @@ import java.util.Calendar;
 import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import java.util.ArrayList;
+import java.util.List;
 
 public class HomeFragment extends Fragment {
 
     private HomeViewModel homeViewModel;
     private RecyclerView recyclerViewMatches;
+    private RecyclerView recyclerViewDates;
     private MatchAdapter matchAdapter;
+    private DateAdapter dateAdapter;
     private ProgressBar progressBar;
-    private TextView textCurrentDate, textPreviousDay, textNextDay, textNoMatches;
+    private TextView textNoMatches;
 
-    private Calendar currentCalendar = Calendar.getInstance();
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM dd, yyyy", Locale.US);
+    private final SimpleDateFormat apiDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 
     @Nullable
     @Override
@@ -48,80 +52,65 @@ public class HomeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         progressBar = view.findViewById(R.id.progress_bar);
-        textCurrentDate = view.findViewById(R.id.text_current_date);
-        textPreviousDay = view.findViewById(R.id.text_previous_day);
-        textNextDay = view.findViewById(R.id.text_next_day);
         textNoMatches = view.findViewById(R.id.text_no_matches);
+        recyclerViewDates = view.findViewById(R.id.recycler_view_dates);
 
-        setupRecyclerView(view);
-        setupDateControls(); // Logic mới sẽ nằm trong hàm này
+        setupRecyclerView(view); // Hàm này giờ chỉ setup cho RecyclerView trận đấu
+        setupDateRecyclerView(); // Hàm mới để setup RecyclerView ngày
 
         homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         observeViewModel();
 
-        updateDateAndFetchMatches();
+        // Tải trận đấu cho ngày hôm nay khi khởi tạo
+        homeViewModel.fetchMatchesForDate(apiDateFormat.format(Calendar.getInstance().getTime()));
     }
 
-    private void setupDateControls() {
-        // Sự kiện cho nút "Previous Day"
-        textPreviousDay.setOnClickListener(v -> {
-            currentCalendar.add(Calendar.DAY_OF_YEAR, -1);
-            updateDateAndFetchMatches();
+    private void setupDateRecyclerView() {
+        List<Calendar> dates = new ArrayList<>();
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_YEAR, -30); // Bắt đầu từ 30 ngày trước
+
+        for (int i = 0; i < 60; i++) {
+            dates.add((Calendar) calendar.clone());
+            calendar.add(Calendar.DAY_OF_YEAR, 1);
+        }
+
+        int todayPosition = 30; // Vị trí của ngày hôm nay trong danh sách
+
+        dateAdapter = new DateAdapter(dates, todayPosition, selectedDate -> {
+            String dateForApi = apiDateFormat.format(selectedDate.getTime());
+            homeViewModel.fetchMatchesForDate(dateForApi);
         });
 
-        // Sự kiện cho nút "Next Day"
-        textNextDay.setOnClickListener(v -> {
-            currentCalendar.add(Calendar.DAY_OF_YEAR, 1);
-            updateDateAndFetchMatches();
-        });
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        recyclerViewDates.setLayoutManager(layoutManager);
+        recyclerViewDates.setAdapter(dateAdapter);
 
+        recyclerViewDates.post(() -> {
+            // Đầu tiên, cuộn đến vị trí "Hôm nay" để đảm bảo nó nằm trong vùng hiển thị.
+            layoutManager.scrollToPosition(todayPosition);
 
-        textCurrentDate.setOnClickListener(v -> {
-            DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
-                @Override
-                public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                    // Cập nhật Calendar với ngày người dùng đã chọn
-                    currentCalendar.set(Calendar.YEAR, year);
-                    currentCalendar.set(Calendar.MONTH, month);
-                    currentCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-
-                    // Gọi hàm để cập nhật UI và tải dữ liệu, giống hệt như khi nhấn Next/Previous
-                    updateDateAndFetchMatches();
+            // Post thêm một tác vụ nữa để chạy sau khi việc cuộn ở trên hoàn tất.
+            // Điều này đảm bảo rằng view của "Hôm nay" đã được tạo.
+            recyclerViewDates.post(() -> {
+                View view = layoutManager.findViewByPosition(todayPosition);
+                if (view != null) {
+                    // Bây giờ, ta có thể lấy chiều rộng của view và tính toán offset để căn giữa.
+                    int offset = recyclerViewDates.getWidth() / 2 - view.getWidth() / 2;
+                    layoutManager.scrollToPositionWithOffset(todayPosition, offset);
                 }
-            };
-
-            // 2. Lấy ngày, tháng, năm hiện tại từ `currentCalendar` để hiển thị trên Lịch
-            int year = currentCalendar.get(Calendar.YEAR);
-            int month = currentCalendar.get(Calendar.MONTH);
-            int day = currentCalendar.get(Calendar.DAY_OF_MONTH);
-
-            // 3. Tạo và hiển thị DatePickerDialog
-            DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), dateSetListener, year, month, day);
-            datePickerDialog.show();
+            });
         });
-
-    }
-
-    private void updateDateAndFetchMatches() {
-        textCurrentDate.setText(dateFormat.format(currentCalendar.getTime()));
-
-        SimpleDateFormat apiDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-        String dateForApi = apiDateFormat.format(currentCalendar.getTime());
-
-        homeViewModel.fetchMatchesForDate(dateForApi);
     }
 
     private void setupRecyclerView(View view) {
         recyclerViewMatches = view.findViewById(R.id.recycler_view_matches);
         matchAdapter = new MatchAdapter();
 
-        // Sử dụng một lớp ẩn danh (anonymous inner class) đầy đủ vì interface có 2 phương thức
         matchAdapter.setOnItemClickListener(new MatchAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(Match match) {
-                // Đoạn code này bây giờ sẽ hoàn toàn chính xác
                 Intent intent = new Intent(getActivity(), MatchDetailsActivity.class);
-                // "match" ở đây là một đối tượng Match, không phải lambda
                 intent.putExtra("EXTRA_MATCH", match);
                 startActivity(intent);
             }
@@ -160,13 +149,10 @@ public class HomeFragment extends Fragment {
         });
 
         homeViewModel.getFavoriteMatches().observe(getViewLifecycleOwner(), favoriteMatches -> {
-            // "favoriteMatches" bây giờ là một List<Match>
             if (favoriteMatches != null) {
-                // Sửa lại logic để lấy matchId từ đối tượng Match
                 Set<Integer> favoriteIds = favoriteMatches.stream()
-                        .map(Match::getMatchId) // THAY ĐỔI TỪ FavoriteMatch::getMatchId
+                        .map(Match::getMatchId)
                         .collect(Collectors.toSet());
-
                 matchAdapter.setFavoriteMatchIds(favoriteIds);
             }
         });

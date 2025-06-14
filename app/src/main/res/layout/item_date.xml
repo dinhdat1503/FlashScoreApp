@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="12dp"
+    android:background="?attr/selectableItemBackground"
+    android:minWidth="70dp">
+
+    <TextView
+        android:id="@+id/text_day_of_week"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        tools:text="HÔM NAY" />
+
+    <TextView
+        android:id="@+id/text_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:layout_marginTop="4dp"
+        tools:text="13.06." />
+
+    <View
+        android:id="@+id/view_indicator"
+        android:layout_width="30dp"
+        android:layout_height="3dp"
+        android:layout_marginTop="8dp"
+        android:background="@color/selected_date_color"
+        android:visibility="invisible"
+        tools:visibility="visible"/>
+
+</LinearLayout>
