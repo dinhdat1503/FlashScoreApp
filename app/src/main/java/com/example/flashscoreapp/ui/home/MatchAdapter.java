@@ -47,8 +47,21 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.MatchViewHol
     public void onBindViewHolder(@NonNull MatchViewHolder holder, int position) {
         Match match = matches.get(position);
         boolean isFavorite = favoriteMatchIds.contains(match.getMatchId());
-        // Lỗi "Expected 1 argument but found 2" được sửa ở đây, vì hàm bind() dưới đây đã được định nghĩa để nhận 2 tham số.
         holder.bind(match, isFavorite);
+
+        // --- QUAN TRỌNG: XỬ LÝ SỰ KIỆN CLICK Ở ĐÂY ---
+        // Vì onBindViewHolder không phải static, nó có thể truy cập 'listener'
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onItemClick(match);
+            }
+        });
+
+        holder.imageViewFavorite.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onFavoriteClick(match, isFavorite);
+            }
+        });
     }
 
     @Override
@@ -68,10 +81,9 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.MatchViewHol
         notifyDataSetChanged();
     }
 
-    class MatchViewHolder extends RecyclerView.ViewHolder {
+    public static class MatchViewHolder extends RecyclerView.ViewHolder {
         private final TextView textViewStatus, textViewLeague, textViewHomeTeam, textViewAwayTeam, textViewScore;
         private final ImageView imageViewHomeLogo, imageViewAwayLogo;
-        // Lỗi "Cannot resolve symbol 'imageViewFavorite'" được sửa ở đây: Khai báo biến.
         private final ImageView imageViewFavorite;
 
         public MatchViewHolder(@NonNull View itemView) {
@@ -84,30 +96,16 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.MatchViewHol
             imageViewHomeLogo = itemView.findViewById(R.id.image_view_home_logo);
             imageViewAwayLogo = itemView.findViewById(R.id.image_view_away_logo);
             imageViewFavorite = itemView.findViewById(R.id.image_view_favorite);
-
-            itemView.setOnClickListener(v -> {
-                int position = getAdapterPosition();
-                if (listener != null && position != RecyclerView.NO_POSITION) {
-                    listener.onItemClick(matches.get(position));
-                }
-            });
-
-            imageViewFavorite.setOnClickListener(v -> {
-                int position = getAdapterPosition();
-                if (listener != null && position != RecyclerView.NO_POSITION) {
-                    Match match = matches.get(position);
-                    boolean isCurrentlyFavorite = favoriteMatchIds.contains(match.getMatchId());
-                    listener.onFavoriteClick(match, isCurrentlyFavorite);
-                }
-            });
+            // --- QUAN TRỌNG: Không đặt setOnClickListener ở đây nữa ---
         }
 
-        // Lỗi "Cannot resolve symbol 'isFavorite'" được sửa ở đây: Định nghĩa hàm bind với tham số isFavorite.
         public void bind(Match match, boolean isFavorite) {
             textViewStatus.setText(match.getStatus());
-            textViewLeague.setText(match.getLeague().getName());
-            textViewHomeTeam.setText(match.getHomeTeam().getName());
-            textViewAwayTeam.setText(match.getAwayTeam().getName());
+            // Lỗi "Cannot resolve method 'getLeague' in 'Match'" và các lỗi tương tự được sửa ở đây,
+            // bằng cách đảm bảo các getter trong lớp Match là public.
+            if(match.getLeague() != null) textViewLeague.setText(match.getLeague().getName());
+            if(match.getHomeTeam() != null) textViewHomeTeam.setText(match.getHomeTeam().getName());
+            if(match.getAwayTeam() != null) textViewAwayTeam.setText(match.getAwayTeam().getName());
 
             if ("NS".equals(match.getStatus())) {
                 SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
@@ -115,12 +113,14 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.MatchViewHol
                 textViewScore.setText(sdf.format(new Date(match.getMatchTime())));
             } else {
                 Score score = match.getScore();
-                String scoreText = score.getHome() + " - " + score.getAway();
-                textViewScore.setText(scoreText);
+                if(score != null) {
+                    String scoreText = score.getHome() + " - " + score.getAway();
+                    textViewScore.setText(scoreText);
+                }
             }
 
-            Glide.with(itemView.getContext()).load(match.getHomeTeam().getLogoUrl()).placeholder(R.drawable.ic_leagues_24).error(R.drawable.ic_settings_24).into(imageViewHomeLogo);
-            Glide.with(itemView.getContext()).load(match.getAwayTeam().getLogoUrl()).placeholder(R.drawable.ic_leagues_24).error(R.drawable.ic_settings_24).into(imageViewAwayLogo);
+            if(match.getHomeTeam() != null) Glide.with(itemView.getContext()).load(match.getHomeTeam().getLogoUrl()).placeholder(R.drawable.ic_leagues_24).error(R.drawable.ic_settings_24).into(imageViewHomeLogo);
+            if(match.getAwayTeam() != null) Glide.with(itemView.getContext()).load(match.getAwayTeam().getLogoUrl()).placeholder(R.drawable.ic_leagues_24).error(R.drawable.ic_settings_24).into(imageViewAwayLogo);
 
             if (isFavorite) {
                 imageViewFavorite.setImageResource(R.drawable.ic_star_filled);

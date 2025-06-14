@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.example.flashscoreapp.data.api.ApiService;
 import com.example.flashscoreapp.data.api.RetrofitClient;
 import com.example.flashscoreapp.data.model.ApiEvent;
+import com.example.flashscoreapp.data.model.ApiFixture;
 import com.example.flashscoreapp.data.model.ApiLeagueData;
 import com.example.flashscoreapp.data.model.ApiLeaguesResponse;
 import com.example.flashscoreapp.data.model.ApiResponse;
@@ -22,6 +23,7 @@ import com.example.flashscoreapp.data.model.MatchDetails;
 import com.example.flashscoreapp.data.model.Score;
 import com.example.flashscoreapp.data.model.StandingItem;
 import com.example.flashscoreapp.data.model.Team;
+import com.example.flashscoreapp.data.model.ApiLeagueData;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -49,6 +51,7 @@ import com.example.flashscoreapp.data.db.MatchDao;
 import com.example.flashscoreapp.data.model.FavoriteMatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 public class MatchRepository {
     private final ApiService apiService;
@@ -89,9 +92,20 @@ public class MatchRepository {
             public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
                 if (response.isSuccessful() && response.body() != null && !response.body().getResponse().isEmpty()) {
                     ApiMatch apiMatch = response.body().getResponse().get(0);
+
+                    // Lấy dữ liệu events
                     List<MatchEvent> events = convertApiEventsToDomain(apiMatch.getEvents());
-                    combinedDetails.setEvents(events); // Cập nhật events vào đối tượng chung
-                    detailsData.postValue(combinedDetails); // Cập nhật UI lần 1
+                    combinedDetails.setEvents(events);
+
+                    ApiFixture fixture = apiMatch.getFixture();
+                    if (fixture != null) {
+                        combinedDetails.setReferee(fixture.getReferee());
+                        if (fixture.getVenue() != null) {
+                            combinedDetails.setStadium(fixture.getVenue().getName());
+                        }
+                    }
+
+                    detailsData.postValue(combinedDetails);
                 }
             }
             @Override
@@ -161,6 +175,7 @@ public class MatchRepository {
             String finalEventType = eventType.equals("Card") ? eventDetail : eventType;
 
             MatchEvent matchEvent = new MatchEvent(
+                    apiEvent.getTeam().getId(),
                     apiEvent.getTime().getElapsed(),
                     apiEvent.getTeam().getName(),
                     apiEvent.getPlayer().getName(),
@@ -222,8 +237,8 @@ public class MatchRepository {
         for (ApiMatch apiMatch : apiMatches) {
             // Chuyển đổi các lớp con
             League league = new League(apiMatch.getLeague().getName());
-            Team homeTeam = new Team(apiMatch.getTeams().getHome().getName(), apiMatch.getTeams().getHome().getLogo());
-            Team awayTeam = new Team(apiMatch.getTeams().getAway().getName(), apiMatch.getTeams().getAway().getLogo());
+            Team homeTeam = new Team(apiMatch.getTeams().getHome().getId(), apiMatch.getTeams().getHome().getName(), apiMatch.getTeams().getHome().getLogo());
+            Team awayTeam = new Team(apiMatch.getTeams().getAway().getId(), apiMatch.getTeams().getAway().getName(), apiMatch.getTeams().getAway().getLogo());
 
             Integer homeGoals = apiMatch.getGoals().getHome();
             Integer awayGoals = apiMatch.getGoals().getAway();
@@ -247,14 +262,14 @@ public class MatchRepository {
                     awayTeam,
                     matchTime,
                     apiMatch.getFixture().getStatus().getShortStatus(),
-                    score
+                    score,
+                    apiMatch.getLeague().getRound()
             );
             domainMatches.add(match);
         }
         return domainMatches;
     }
 
-    // Bạn có thể giữ lại các phương thức dùng mock data để tiện cho việc test
     public LiveData<List<Match>> getMatchesByDateFromMock(Context context, String date) {
         // ... giữ nguyên code cũ
         final MutableLiveData<List<Match>> data = new MutableLiveData<>();
@@ -273,7 +288,6 @@ public class MatchRepository {
     }
 
     public LiveData<MatchDetails> getMatchDetailsFromMock(Context context, int matchId) {
-        // ... giữ nguyên code cũ
         final MutableLiveData<MatchDetails> data = new MutableLiveData<>();
         String fileName = "mock_match_details_" + matchId + ".json";
         String jsonString = loadJSONFromAsset(context, fileName);
@@ -357,6 +371,53 @@ public class MatchRepository {
             }
         });
 
+        return data;
+    }
+
+    public LiveData<List<ApiLeagueData>> getLeaguesWithSeasons() {
+        final MutableLiveData<List<ApiLeagueData>> data = new MutableLiveData<>();
+
+        apiService.getLeagues(API_KEY, API_HOST).enqueue(new Callback<ApiLeaguesResponse>() {
+            @Override
+            public void onResponse(Call<ApiLeaguesResponse> call, Response<ApiLeaguesResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    // Trả về toàn bộ ApiLeagueData
+                    data.postValue(response.body().getResponse());
+                } else {
+                    data.postValue(null);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiLeaguesResponse> call, Throwable t) {
+                data.postValue(null);
+            }
+        });
+        return data;
+    }
+
+    public LiveData<List<Match>> getResultsForLeague(int leagueId, int season) {
+        final MutableLiveData<List<Match>> data = new MutableLiveData<>();
+        apiService.getFixturesByLeagueAndSeason(leagueId, season, API_KEY, API_HOST).enqueue(new Callback<ApiResponse>() {
+            @Override
+            public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<Match> allMatches = convertApiMatchesToDomain(response.body().getResponse());
+                    // Lọc ra các trận đã kết thúc (FT - Full Time)
+                    List<Match> finishedMatches = allMatches.stream()
+                            .filter(match -> match.getStatus().equals("FT"))
+                            .collect(Collectors.toList());
+                    data.postValue(finishedMatches);
+                } else {
+                    data.postValue(null);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse> call, Throwable t) {
+                data.postValue(null);
+            }
+        });
         return data;
     }
 

@@ -1,12 +1,15 @@
 package com.example.flashscoreapp.data.model;
-import com.google.gson.annotations.SerializedName;
 
-public class ApiLeague {
+import com.google.gson.annotations.SerializedName;
+import java.io.Serializable;
+
+public class ApiVenue implements Serializable {
     @SerializedName("name")
     private String name;
-    @SerializedName("round")
-    private String round;
+
+    @SerializedName("city")
+    private String city;
 
     public String getName() { return name; }
-    public String getRound() { return round;}
+    public String getCity() { return city; }
 }

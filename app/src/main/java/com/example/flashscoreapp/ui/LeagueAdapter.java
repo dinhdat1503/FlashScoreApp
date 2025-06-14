@@ -9,22 +9,25 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.flashscoreapp.R;
+import com.example.flashscoreapp.data.model.ApiLeagueData;
 import com.example.flashscoreapp.data.model.League;
 import java.util.ArrayList;
 import java.util.List;
 
 public class LeagueAdapter extends RecyclerView.Adapter<LeagueAdapter.LeagueViewHolder> {
 
-    private List<League> leagues = new ArrayList<>();
+    private List<ApiLeagueData> leaguesData = new ArrayList<>();
     public interface OnLeagueClickListener {
-        void onLeagueClick(League league);
+        void onLeagueClick(ApiLeagueData leagueData);
     }
     private OnLeagueClickListener clickListener;
     public void setOnLeagueClickListener(OnLeagueClickListener listener) {
         this.clickListener = listener;
     }
-    public void setLeagues(List<League> leagues) {
-        this.leagues = leagues;
+
+
+    public void setLeaguesData(List<ApiLeagueData> leaguesData) {
+        this.leaguesData = leaguesData;
         notifyDataSetChanged();
     }
 
@@ -37,12 +40,12 @@ public class LeagueAdapter extends RecyclerView.Adapter<LeagueAdapter.LeagueView
 
     @Override
     public void onBindViewHolder(@NonNull LeagueViewHolder holder, int position) {
-        holder.bind(leagues.get(position));
+        holder.bind(leaguesData.get(position).getLeague());
     }
 
     @Override
     public int getItemCount() {
-        return leagues.size();
+        return leaguesData.size();
     }
 
     class LeagueViewHolder extends RecyclerView.ViewHolder {
@@ -55,7 +58,8 @@ public class LeagueAdapter extends RecyclerView.Adapter<LeagueAdapter.LeagueView
             leagueName = itemView.findViewById(R.id.text_league_name);
             itemView.setOnClickListener(v -> {
                 if (clickListener != null && getAdapterPosition() != RecyclerView.NO_POSITION) {
-                    clickListener.onLeagueClick(leagues.get(getAdapterPosition()));
+                    // TRUYỀN ĐI NGUYÊN ĐỐI TƯỢNG ApiLeagueData
+                    clickListener.onLeagueClick(leaguesData.get(getAdapterPosition()));
                 }
             });
         }

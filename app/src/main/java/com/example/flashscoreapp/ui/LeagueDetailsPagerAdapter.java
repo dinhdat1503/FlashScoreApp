@@ -21,12 +21,11 @@ public class LeagueDetailsPagerAdapter extends FragmentStateAdapter {
     public Fragment createFragment(int position) {
         switch (position) {
             case 1:
-                return new ResultsTabFragment(); // Tab Kết quả
+                return ResultsTabFragment.newInstance(leagueId, season);
             case 2:
-                return new FixturesTabFragment(); // Tab Lịch thi đấu
+                return new FixturesTabFragment();
             case 0:
             default:
-                // Truyền leagueId và season vào cho StandingsTabFragment
                 return StandingsTabFragment.newInstance(leagueId, season);
         }
     }

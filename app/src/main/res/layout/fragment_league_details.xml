@@ -43,14 +43,73 @@
         </LinearLayout>
     </LinearLayout>
 
-    <TextView
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Thanh trượt mùa giải (sắp có)"
-        android:gravity="center"
-        android:padding="8dp"
-        android:visibility="gone"
-        tools:visibility="visible"/>
+        android:paddingHorizontal="22dp">
+
+        <View
+            android:id="@+id/start_cap"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:background="@drawable/circle_background"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <FrameLayout
+            android:id="@+id/end_cap_trophy"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/circle_background" />
+            <ImageView
+                android:id="@+id/image_trophy"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_leagues_24"
+                app:tint="@android:color/white" />
+        </FrameLayout>
+
+        <ProgressBar
+            android:id="@+id/progress_bar_season"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:progress="60"
+            android:progressDrawable="@drawable/custom_progress_bar"
+            android:minHeight="8dp"
+            android:maxHeight="8dp"
+            app:layout_constraintStart_toEndOf="@id/start_cap"
+            app:layout_constraintEnd_toStartOf="@id/end_cap_trophy"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <TextView
+            android:id="@+id/text_season_start_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="16.08."
+            android:textSize="12sp"
+
+            app:layout_constraintTop_toBottomOf="@id/start_cap"
+            app:layout_constraintStart_toStartOf="parent" />
+        <TextView
+            android:id="@+id/text_season_end_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="25.05."
+            android:textSize="12sp"
+            app:layout_constraintTop_toBottomOf="@id/end_cap_trophy"
+            app:layout_constraintEnd_toEndOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout_main"

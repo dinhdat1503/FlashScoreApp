@@ -25,8 +25,10 @@ public class Match implements Serializable {
     @SerializedName("score")
     private Score score;
 
+    private String round;
+
     // --- CONSTRUCTOR MỚI ---
-    public Match(int matchId, League league, Team homeTeam, Team awayTeam, long matchTime, String status, Score score) {
+    public Match(int matchId, League league, Team homeTeam, Team awayTeam, long matchTime, String status, Score score, String round) {
         this.matchId = matchId;
         this.league = league;
         this.homeTeam = homeTeam;
@@ -34,6 +36,7 @@ public class Match implements Serializable {
         this.matchTime = matchTime;
         this.status = status;
         this.score = score;
+        this.round = round;
     }
 
     // Getters for all fields
@@ -44,4 +47,5 @@ public class Match implements Serializable {
     public long getMatchTime() { return matchTime; }
     public String getStatus() { return status; }
     public Score getScore() { return score; }
+    public String getRound() { return round; }
 }

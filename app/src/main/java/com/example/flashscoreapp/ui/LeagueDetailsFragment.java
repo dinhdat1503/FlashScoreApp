@@ -7,41 +7,51 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
-import android.widget.TextView; // Thêm import này
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.bumptech.glide.Glide; // Thêm import này
+import com.bumptech.glide.Glide;
 import com.example.flashscoreapp.R;
+import com.example.flashscoreapp.data.model.Season;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
+import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class LeagueDetailsFragment extends Fragment {
 
     private int leagueId;
     private String leagueName;
     private String leagueLogoUrl;
-    private int selectedSeason;
+    private List<Season> allSeasons;
+    private Season selectedSeasonObject;
 
-    public static LeagueDetailsFragment newInstance(int leagueId, String leagueName, String leagueLogoUrl) {
+    // Phương thức newInstance này đã đúng, không cần sửa
+    public static LeagueDetailsFragment newInstance(int leagueId, String leagueName, String leagueLogoUrl, List<Season> seasons) {
         LeagueDetailsFragment fragment = new LeagueDetailsFragment();
         Bundle args = new Bundle();
         args.putInt("LEAGUE_ID", leagueId);
         args.putString("LEAGUE_NAME", leagueName);
         args.putString("LEAGUE_LOGO_URL", leagueLogoUrl);
+        args.putSerializable("SEASONS_LIST", (Serializable) seasons);
         fragment.setArguments(args);
         return fragment;
     }
 
+    // Phương thức onCreate này đã đúng, không cần sửa
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,10 +59,15 @@ public class LeagueDetailsFragment extends Fragment {
             leagueId = getArguments().getInt("LEAGUE_ID");
             leagueName = getArguments().getString("LEAGUE_NAME");
             leagueLogoUrl = getArguments().getString("LEAGUE_LOGO_URL");
-            selectedSeason = Calendar.getInstance().get(Calendar.YEAR) - 1;
+            allSeasons = (List<Season>) getArguments().getSerializable("SEASONS_LIST");
+
+            if (allSeasons != null && !allSeasons.isEmpty()) {
+                selectedSeasonObject = allSeasons.get(allSeasons.size() - 1);
+            }
         }
     }
 
+    // Phương thức onCreateView này đã đúng, không cần sửa
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup c, @Nullable Bundle s) {
@@ -68,9 +83,17 @@ public class LeagueDetailsFragment extends Fragment {
         TextView leagueNameTextView = view.findViewById(R.id.text_league_name_header);
         Spinner seasonSpinner = view.findViewById(R.id.spinner_season);
         TabLayout tabLayout = view.findViewById(R.id.tab_layout_main);
+        // SỬA: Phải tìm và gán giá trị cho viewPager ở đây
         ViewPager2 viewPager = view.findViewById(R.id.view_pager_main);
 
+        // XÓA: Bỏ toàn bộ khối if (currentSeason != null) {...} vì nó không cần thiết và sai
+        /*
+         if (currentSeason != null) {
+            ...
+         }
+        */
 
+        // Gán dữ liệu cho header
         leagueNameTextView.setText(leagueName);
         Glide.with(this)
                 .load(leagueLogoUrl)
@@ -78,12 +101,17 @@ public class LeagueDetailsFragment extends Fragment {
                 .error(R.drawable.ic_leagues_24)
                 .into(leagueLogoImageView);
 
+        // Cập nhật UI cho mùa giải được chọn ban đầu
+        updateSeasonUI(view, selectedSeasonObject);
 
         // Setup Spinner mùa giải
-        setupSeasonSpinner(seasonSpinner, viewPager);
+        // SỬA: Truyền vào `view` để phương thức con có thể tìm các view khác
+        setupSeasonSpinner(view, seasonSpinner, viewPager);
 
         // Setup ViewPager và TabLayout
-        viewPager.setAdapter(new LeagueDetailsPagerAdapter(this, leagueId, selectedSeason));
+        if (selectedSeasonObject != null) {
+            viewPager.setAdapter(new LeagueDetailsPagerAdapter(this, leagueId, selectedSeasonObject.getYear()));
+        }
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
             switch (position) {
                 case 0: tab.setText("BẢNG XẾP HẠNG"); break;
@@ -93,27 +121,71 @@ public class LeagueDetailsFragment extends Fragment {
         }).attach();
     }
 
-    private void setupSeasonSpinner(Spinner spinner, ViewPager2 viewPager) {
-        List<String> seasons = new ArrayList<>();
-        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-        for (int i = 0; i < 10; i++) {
-            int seasonStartYear = currentYear - 1 - i;
-            seasons.add(seasonStartYear + "/" + (seasonStartYear + 1));
-        }
+    // Phương thức này đã đúng, không cần sửa
+    private void setupSeasonSpinner(View rootView, Spinner spinner, ViewPager2 viewPager) {
+        if (allSeasons == null || allSeasons.isEmpty()) return;
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, seasons);
+        List<String> seasonYears = new ArrayList<>();
+        int selectionIndex = 0;
+        for (int i = 0; i < allSeasons.size(); i++) {
+            Season s = allSeasons.get(i);
+            seasonYears.add(s.getYear() + "/" + (s.getYear() + 1));
+            if (selectedSeasonObject != null && s.getYear() == selectedSeasonObject.getYear()) {
+                selectionIndex = i;
+            }
+        }
+        Collections.reverse(seasonYears);
+        selectionIndex = seasonYears.size() - 1 - selectionIndex;
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, seasonYears);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
+        spinner.setSelection(selectionIndex);
 
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String selected = (String) parent.getItemAtPosition(position);
-                selectedSeason = Integer.parseInt(selected.substring(0, 4));
-                viewPager.setAdapter(new LeagueDetailsPagerAdapter(LeagueDetailsFragment.this, leagueId, selectedSeason));
+                selectedSeasonObject = allSeasons.get(allSeasons.size() - 1 - position);
+                updateSeasonUI(rootView, selectedSeasonObject);
+                viewPager.setAdapter(new LeagueDetailsPagerAdapter(LeagueDetailsFragment.this, leagueId, selectedSeasonObject.getYear()));
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {}
         });
+    }
+
+    // Phương thức này đã đúng, không cần sửa
+    private void updateSeasonUI(View rootView, Season season) {
+        TextView textStartDate = rootView.findViewById(R.id.text_season_start_date);
+        TextView textEndDate = rootView.findViewById(R.id.text_season_end_date);
+        ProgressBar seasonProgressBar = rootView.findViewById(R.id.progress_bar_season);
+
+        if (season == null) return;
+
+        SimpleDateFormat apiFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+        SimpleDateFormat displayFormat = new SimpleDateFormat("dd.MM.", Locale.US);
+
+        try {
+            Date startDate = apiFormat.parse(season.getStart());
+            Date endDate = apiFormat.parse(season.getEnd());
+            textStartDate.setText(displayFormat.format(startDate));
+            textEndDate.setText(displayFormat.format(endDate));
+
+            Date today = new Date();
+            if (today.after(startDate) && today.before(endDate)) {
+                long totalDuration = endDate.getTime() - startDate.getTime();
+                long elapsedDuration = today.getTime() - startDate.getTime();
+                int progress = (int) ((double) elapsedDuration / totalDuration * 100);
+                seasonProgressBar.setProgress(progress);
+            } else if (today.after(endDate) || today.equals(endDate)) {
+                seasonProgressBar.setProgress(100);
+            } else {
+                seasonProgressBar.setProgress(0);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            textStartDate.setText("N/A");
+            textEndDate.setText("N/A");
+        }
     }
 }

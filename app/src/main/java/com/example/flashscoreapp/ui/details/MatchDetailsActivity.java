@@ -1,111 +1,115 @@
 package com.example.flashscoreapp.ui.details;
 
-import android.content.Intent;
 import android.os.Bundle;
+import android.view.Gravity;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+// SỬA LỖI: Import đúng lớp Toolbar từ thư viện androidx
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
 
+import com.bumptech.glide.Glide;
 import com.example.flashscoreapp.R;
 import com.example.flashscoreapp.data.model.Match;
-import com.example.flashscoreapp.data.model.MatchStatistic;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 
 public class MatchDetailsActivity extends AppCompatActivity {
-
     private MatchDetailsViewModel viewModel;
     private Match match;
-
-    // Khai báo các View
-    private TextView textViewMatchTitle;
-    private TextView textViewStatistics;
-    private RecyclerView recyclerEvents;
-    private MatchEventAdapter eventAdapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_match_details);
 
+        // SỬA LỖI: Sử dụng đúng kiểu androidx.appcompat.widget.Toolbar
+        Toolbar toolbar = findViewById(R.id.toolbar_details);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
 
-        textViewMatchTitle = findViewById(R.id.text_view_match_title);
-        textViewStatistics = findViewById(R.id.text_view_statistics);
-        recyclerEvents = findViewById(R.id.recycler_view_events);
-        // ------------------------------------
 
-        // Lấy đối tượng Match từ Intent
-        Intent intent = getIntent();
-        match = (Match) intent.getSerializableExtra("EXTRA_MATCH");
-
+        match = (Match) getIntent().getSerializableExtra("EXTRA_MATCH");
         if (match == null) {
-            Toast.makeText(this, "Lỗi: không tìm thấy dữ liệu trận đấu", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Lỗi: không có dữ liệu trận đấu", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
 
-        // Cập nhật tiêu đề ngay sau khi có dữ liệu `match`
-        updateMatchHeader();
-
-        // Thiết lập RecyclerView
-        setupRecyclerView();
-
-        // Khởi tạo ViewModel
         MatchDetailsViewModelFactory factory = new MatchDetailsViewModelFactory(getApplication(), match.getMatchId());
         viewModel = new ViewModelProvider(this, factory).get(MatchDetailsViewModel.class);
 
-        // Lắng nghe dữ liệu từ ViewModel
-        observeViewModel();
+        updateScoreboard();
+
+        ViewPager2 viewPager = findViewById(R.id.view_pager_match_details);
+        TabLayout tabLayout = findViewById(R.id.tab_layout_match_details);
+
+        viewPager.setAdapter(new MatchDetailsPagerAdapter(this));
+
+        new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
+            switch (position) {
+                case 0: tab.setText("TÓM TẮT"); break;
+                case 1: tab.setText("SỐ LIỆU"); break;
+                case 2: tab.setText("ĐỘI HÌNH"); break;
+                case 3: tab.setText("ĐỐI ĐẦU"); break;
+                case 4: tab.setText("BẢNG XẾP HẠNG"); break;
+            }
+        }).attach();
+
+        observeMatchInfo();
     }
 
-    private void setupRecyclerView() {
-        eventAdapter = new MatchEventAdapter();
-        recyclerEvents.setAdapter(eventAdapter);
-        // Bạn có thể thêm các tuỳ chỉnh khác cho RecyclerView ở đây
+    private void updateScoreboard() {
+        TextView homeName = findViewById(R.id.text_home_name_details);
+        TextView awayName = findViewById(R.id.text_away_name_details);
+        TextView score = findViewById(R.id.text_score_details);
+        ImageView homeLogo = findViewById(R.id.image_home_logo_details);
+        ImageView awayLogo = findViewById(R.id.image_away_logo_details);
+
+        homeName.setText(match.getHomeTeam().getName());
+        awayName.setText(match.getAwayTeam().getName());
+        score.setText(match.getScore().getHome() + " - " + match.getScore().getAway());
+
+        Glide.with(this).load(match.getHomeTeam().getLogoUrl()).into(homeLogo);
+        Glide.with(this).load(match.getAwayTeam().getLogoUrl()).into(awayLogo);
     }
 
-    private void updateMatchHeader() {
-        if (match == null) return;
-
-        String title;
-        if (match.getStatus().equals("NS")) {
-            title = match.getHomeTeam().getName() + " vs " + match.getAwayTeam().getName();
-        } else {
-            title = match.getHomeTeam().getName() + " " +
-                    match.getScore().getHome() + " - " + match.getScore().getAway() + " " +
-                    match.getAwayTeam().getName();
-        }
-        textViewMatchTitle.setText(title);
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 
-    private void observeViewModel() {
+    private void observeMatchInfo() {
+        final TextView textReferee = findViewById(R.id.text_referee);
+        final TextView textStadium = findViewById(R.id.text_stadium);
+
         viewModel.getMatchDetails().observe(this, details -> {
             if (details != null) {
-                // --- CẬP NHẬT CÁCH HIỂN THỊ THỐNG KÊ ---
-                StringBuilder statsBuilder = new StringBuilder();
-                if (details.getStatistics() != null && !details.getStatistics().isEmpty()) {
-                    for (MatchStatistic stat : details.getStatistics()) {
-                        statsBuilder
-                                .append(stat.getType())
-                                .append(":  ") // Thêm khoảng trắng
-                                .append(stat.getHomeValue())
-                                .append(" - ")
-                                .append(stat.getAwayValue())
-                                .append("\n\n"); // Thêm 2 lần xuống dòng cho thoáng
-                    }
-                    textViewStatistics.setText(statsBuilder.toString());
+                if (details.getReferee() != null && !details.getReferee().isEmpty()) {
+                    textReferee.setText(details.getReferee());
                 } else {
-                    textViewStatistics.setText("Không có dữ liệu thống kê.");
+                    textReferee.setText("N/A");
                 }
 
-                // Cập nhật danh sách sự kiện (giữ nguyên)
-                if (details.getEvents() != null) {
-                    eventAdapter.setEvents(details.getEvents());
+                if (details.getStadium() != null && !details.getStadium().isEmpty()) {
+                    textStadium.setText(details.getStadium());
+                } else {
+                    textStadium.setText("N/A");
                 }
-            } else {
-                Toast.makeText(this, "Không tìm thấy chi tiết cho trận đấu này", Toast.LENGTH_SHORT).show();
             }
         });
     }
+
+    public Match getMatch() { return this.match; }
 }

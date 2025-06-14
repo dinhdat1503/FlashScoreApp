@@ -13,6 +13,9 @@ public class MatchDetails {
     @SerializedName("events")
     private List<MatchEvent> events;
 
+    private String referee;
+    private String stadium;
+
     public int getMatchId() { return matchId; }
     public MatchDetails(int matchId, List<MatchStatistic> statistics, List<MatchEvent> events) {
         this.matchId = matchId;
@@ -23,4 +26,8 @@ public class MatchDetails {
     public List<MatchEvent> getEvents() { return events; }
     public void setEvents(List<MatchEvent> events) { this.events = events; }
     public void setStatistics(List<MatchStatistic> statistics) { this.statistics = statistics; }
+    public String getReferee() { return referee; }
+    public void setReferee(String referee) { this.referee = referee; }
+    public String getStadium() { return stadium; }
+    public void setStadium(String stadium) { this.stadium = stadium; }
 }

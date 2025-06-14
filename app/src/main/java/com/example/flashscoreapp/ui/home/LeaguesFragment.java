@@ -5,6 +5,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -16,6 +18,11 @@ import com.example.flashscoreapp.R;
 import com.example.flashscoreapp.ui.LeagueAdapter;
 import com.example.flashscoreapp.ui.LeagueDetailsFragment;
 import com.example.flashscoreapp.ui.LeaguesViewModel;
+import com.example.flashscoreapp.data.model.ApiLeagueData;
+import com.example.flashscoreapp.data.model.League;
+import com.example.flashscoreapp.data.model.Season;
+
+import java.util.List;
 
 public class LeaguesFragment extends Fragment {
 
@@ -42,14 +49,21 @@ public class LeaguesFragment extends Fragment {
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
         recyclerView.setAdapter(adapter);
 
-        adapter.setOnLeagueClickListener(league -> {
-            LeagueDetailsFragment detailsFragment = LeagueDetailsFragment.newInstance(league.getId(), league.getName(), league.getLogoUrl());
 
-            // Thay thế fragment hiện tại bằng fragment chi tiết giải đấu mới
-            getActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, detailsFragment)
-                    .addToBackStack(null) // Cho phép nhấn nút back để quay lại
-                    .commit();
+        adapter.setOnLeagueClickListener(leagueData -> {
+            League league = leagueData.getLeague();
+            List<Season> seasons = leagueData.getSeasons();
+
+            if (seasons != null && !seasons.isEmpty()) {
+                // Truyền đi cả danh sách seasons
+                LeagueDetailsFragment detailsFragment = LeagueDetailsFragment.newInstance(league.getId(), league.getName(), league.getLogoUrl(), seasons);
+                getActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, detailsFragment)
+                        .addToBackStack(null)
+                        .commit();
+            } else {
+                Toast.makeText(getContext(), "Không tìm thấy thông tin mùa giải", Toast.LENGTH_SHORT).show();
+            }
         });
 
         leaguesViewModel = new ViewModelProvider(this).get(LeaguesViewModel.class);
@@ -58,10 +72,10 @@ public class LeaguesFragment extends Fragment {
 
     private void observeViewModel() {
         progressBar.setVisibility(View.VISIBLE);
-        leaguesViewModel.getLeagues().observe(getViewLifecycleOwner(), leagues -> {
+        leaguesViewModel.getLeaguesData().observe(getViewLifecycleOwner(), leaguesData -> {
             progressBar.setVisibility(View.GONE);
-            if (leagues != null) {
-                adapter.setLeagues(leagues);
+            if (leaguesData != null) {
+                adapter.setLeaguesData(leaguesData);
             }
         });
     }

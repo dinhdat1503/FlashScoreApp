@@ -49,4 +49,11 @@ public interface ApiService {
             @Header("x-rapidapi-host") String apiHost
     );
 
+    @GET("fixtures")
+    Call<ApiResponse> getFixturesByLeagueAndSeason(
+            @Query("league") int leagueId,
+            @Query("season") int season,
+            @Header("x-rapidapi-key") String apiKey,
+            @Header("x-rapidapi-host") String apiHost
+    );
 }
