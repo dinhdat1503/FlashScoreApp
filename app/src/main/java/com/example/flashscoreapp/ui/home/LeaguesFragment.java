@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.flashscoreapp.R;
 import com.example.flashscoreapp.ui.LeagueAdapter;
+import com.example.flashscoreapp.ui.LeagueDetailsFragment;
 import com.example.flashscoreapp.ui.LeaguesViewModel;
 
 public class LeaguesFragment extends Fragment {
@@ -42,11 +43,11 @@ public class LeaguesFragment extends Fragment {
         recyclerView.setAdapter(adapter);
 
         adapter.setOnLeagueClickListener(league -> {
-            StandingsFragment standingsFragment = StandingsFragment.newInstance(league.getId(), league.getName());
+            LeagueDetailsFragment detailsFragment = LeagueDetailsFragment.newInstance(league.getId(), league.getName(), league.getLogoUrl());
 
-            // Thay thế fragment hiện tại bằng fragment bảng xếp hạng
+            // Thay thế fragment hiện tại bằng fragment chi tiết giải đấu mới
             getActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, standingsFragment)
+                    .replace(R.id.fragment_container, detailsFragment)
                     .addToBackStack(null) // Cho phép nhấn nút back để quay lại
                     .commit();
         });

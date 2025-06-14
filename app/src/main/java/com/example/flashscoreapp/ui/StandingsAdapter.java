@@ -40,7 +40,7 @@ public class StandingsAdapter extends RecyclerView.Adapter<StandingsAdapter.Stan
     }
 
     class StandingViewHolder extends RecyclerView.ViewHolder {
-        TextView textRank, textTeamName, textPlayed, textWin, textDraw, textLose, textGoalsDiff, textPoints;
+        TextView textRank, textTeamName, textPlayed, text_goals_for_against, textPoints;
         ImageView imageTeamLogo;
 
         public StandingViewHolder(@NonNull View itemView) {
@@ -48,10 +48,7 @@ public class StandingsAdapter extends RecyclerView.Adapter<StandingsAdapter.Stan
             textRank = itemView.findViewById(R.id.text_rank);
             textTeamName = itemView.findViewById(R.id.text_team_name);
             textPlayed = itemView.findViewById(R.id.text_played);
-            textWin = itemView.findViewById(R.id.text_win);
-            textDraw = itemView.findViewById(R.id.text_draw);
-            textLose = itemView.findViewById(R.id.text_lose);
-            textGoalsDiff = itemView.findViewById(R.id.text_goals_diff);
+            text_goals_for_against = itemView.findViewById(R.id.text_goals_for_against);
             textPoints = itemView.findViewById(R.id.text_points);
             imageTeamLogo = itemView.findViewById(R.id.image_team_logo);
         }
@@ -60,10 +57,11 @@ public class StandingsAdapter extends RecyclerView.Adapter<StandingsAdapter.Stan
             textRank.setText(String.valueOf(item.getRank()));
             textTeamName.setText(item.getTeam().getName());
             textPlayed.setText(String.valueOf(item.getAll().getPlayed()));
-            textWin.setText(String.valueOf(item.getAll().getWin()));
-            textDraw.setText(String.valueOf(item.getAll().getDraw()));
-            textLose.setText(String.valueOf(item.getAll().getLose()));
-            textGoalsDiff.setText(String.valueOf(item.getGoalsDiff()));
+
+            // Hiển thị bàn thắng dạng "For:Against"
+            String goals = item.getAll().getGoals().getGoalsFor() + ":" + item.getAll().getGoals().getGoalsAgainst();
+            text_goals_for_against.setText(goals);
+
             textPoints.setText(String.valueOf(item.getPoints()));
             Glide.with(itemView.getContext()).load(item.getTeam().getLogo()).into(imageTeamLogo);
         }
