@@ -57,8 +57,8 @@ public class MatchRepository {
     private final ApiService apiService;
     private final MatchDao matchDao;
     private final ExecutorService executorService;
-    private final String API_KEY = "e9f057fd50b01827627c9c4ac28f2e44";
-    private final String API_HOST = "v3.football.api-sports.io";
+    private final String API_KEY = "9603cad7a8mshaf2d58ef107a002p1f7706jsn62cf5be4f1d5";
+    private final String API_HOST = "api-football-v1.p.rapidapi.com";
 
     public MatchRepository(Application application) {
         this.apiService = RetrofitClient.getApiService();
