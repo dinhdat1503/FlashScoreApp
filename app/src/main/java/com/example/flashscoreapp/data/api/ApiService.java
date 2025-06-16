@@ -1,9 +1,11 @@
 package com.example.flashscoreapp.data.api;
 
 import com.example.flashscoreapp.data.model.ApiLeaguesResponse;
+import com.example.flashscoreapp.data.model.ApiMatch;
 import com.example.flashscoreapp.data.model.ApiResponse;
 import com.example.flashscoreapp.data.model.ApiStandingsResponse;
 import com.example.flashscoreapp.data.model.ApiStatisticsResponse;
+import com.example.flashscoreapp.data.model.ApiTopScorerData;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -12,22 +14,34 @@ import retrofit2.http.Query;
 
 public interface ApiService {
 
+    // Trả về danh sách các trận đấu
     @GET("fixtures")
-    Call<ApiResponse> getFixturesByDate(
+    Call<ApiResponse<ApiMatch>> getFixturesByDate(
             @Query("date") String date,
             @Header("x-rapidapi-key") String apiKey,
             @Header("x-rapidapi-host") String apiHost
     );
 
-
-    // Endpoint này sẽ trả về thông tin chi tiết của một trận đấu, bao gồm cả các sự kiện (events)
+    // Trả về danh sách các trận đấu (cho chi tiết hoặc kết quả giải đấu)
     @GET("fixtures")
-    Call<ApiResponse> getMatchEvents(
-            @Query("id") int fixtureId,
+    Call<ApiResponse<ApiMatch>> getFixtures(
+            @Query("id") Integer fixtureId,
+            @Query("league") Integer leagueId,
+            @Query("season") Integer seasonYear,
             @Header("x-rapidapi-key") String apiKey,
             @Header("x-rapidapi-host") String apiHost
     );
 
+    // Trả về danh sách cầu thủ ghi bàn
+    @GET("players/topscorers")
+    Call<ApiResponse<ApiTopScorerData>> getTopScorers(
+            @Query("season") int seasonYear,
+            @Query("league") int leagueId,
+            @Header("x-rapidapi-key") String apiKey,
+            @Header("x-rapidapi-host") String apiHost
+    );
+
+    // Các phương thức còn lại giữ nguyên cấu trúc cũ của chúng
     @GET("fixtures/statistics")
     Call<ApiStatisticsResponse> getMatchStatistics(
             @Query("fixture") int fixtureId,
@@ -43,14 +57,6 @@ public interface ApiService {
 
     @GET("standings")
     Call<ApiStandingsResponse> getStandings(
-            @Query("league") int leagueId,
-            @Query("season") int season,
-            @Header("x-rapidapi-key") String apiKey,
-            @Header("x-rapidapi-host") String apiHost
-    );
-
-    @GET("fixtures")
-    Call<ApiResponse> getFixturesByLeagueAndSeason(
             @Query("league") int leagueId,
             @Query("season") int season,
             @Header("x-rapidapi-key") String apiKey,

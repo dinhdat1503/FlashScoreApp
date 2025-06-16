@@ -4,16 +4,33 @@ import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
 
 public class Season implements Serializable {
+    // THÊM TRƯỜNG ID VÀO ĐÂY
+    @SerializedName("id")
+    private int id;
+
     @SerializedName("year")
     private int year;
 
     @SerializedName("start")
-    private String start; // Dạng "YYYY-MM-DD"
+    private String start;
 
     @SerializedName("end")
-    private String end;   // Dạng "YYYY-MM-DD"
+    private String end;
 
-    public int getYear() { return year; }
-    public String getStart() { return start; }
-    public String getEnd() { return end; }
+    // THÊM GETTER CHO ID VÀO ĐÂY
+    public int getId() {
+        return id;
+    }
+
+    public int getYear() {
+        return year;
+    }
+
+    public String getStart() {
+        return start;
+    }
+
+    public String getEnd() {
+        return end;
+    }
 }

@@ -7,12 +7,10 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.flashscoreapp.R;
 import com.example.flashscoreapp.data.model.Match;
 import com.example.flashscoreapp.data.model.RoundHeader;
 import com.example.flashscoreapp.ui.home.MatchAdapter;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,14 +19,9 @@ public class ResultsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private static final int TYPE_MATCH = 1;
 
     private List<Object> items = new ArrayList<>();
+    private MatchAdapter.OnItemClickListener matchClickListener;
 
-    public interface OnMatchClickListener {
-        void onMatchClick(Match match);
-    }
-
-    private OnMatchClickListener matchClickListener;
-
-    public void setOnMatchClickListener(OnMatchClickListener listener) {
+    public void setOnItemClickListener(MatchAdapter.OnItemClickListener listener) {
         this.matchClickListener = listener;
     }
 
@@ -42,20 +35,19 @@ public class ResultsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public int getItemViewType(int position) {
         if (items.get(position) instanceof RoundHeader) {
             return TYPE_HEADER;
-        } else {
-            return TYPE_MATCH;
         }
+        return TYPE_MATCH;
     }
 
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         if (viewType == TYPE_HEADER) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_round_header, parent, false);
+            View view = inflater.inflate(R.layout.item_round_header, parent, false);
             return new HeaderViewHolder(view);
         } else { // TYPE_MATCH
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_match, parent, false);
-            // Tái sử dụng ViewHolder từ MatchAdapter
+            View view = inflater.inflate(R.layout.item_match, parent, false);
             return new MatchAdapter.MatchViewHolder(view);
         }
     }
@@ -68,12 +60,11 @@ public class ResultsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         } else {
             MatchAdapter.MatchViewHolder matchViewHolder = (MatchAdapter.MatchViewHolder) holder;
             Match match = (Match) items.get(position);
-            matchViewHolder.bind(match, false);
+            matchViewHolder.bind(match, false); // Tạm thời không xử lý yêu thích ở đây
 
-            // --- GÁN SỰ KIỆN CLICK Ở ĐÂY ---
             holder.itemView.setOnClickListener(v -> {
                 if (matchClickListener != null) {
-                    matchClickListener.onMatchClick(match);
+                    matchClickListener.onItemClick(match);
                 }
             });
         }
@@ -84,8 +75,8 @@ public class ResultsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         return items.size();
     }
 
-    // ViewHolder cho Header
-    public static class HeaderViewHolder extends RecyclerView.ViewHolder {
+    // ViewHolder cho Tiêu đề
+    static class HeaderViewHolder extends RecyclerView.ViewHolder {
         private final TextView textRoundName;
         public HeaderViewHolder(@NonNull View itemView) {
             super(itemView);

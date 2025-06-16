@@ -86,12 +86,6 @@ public class LeagueDetailsFragment extends Fragment {
         // SỬA: Phải tìm và gán giá trị cho viewPager ở đây
         ViewPager2 viewPager = view.findViewById(R.id.view_pager_main);
 
-        // XÓA: Bỏ toàn bộ khối if (currentSeason != null) {...} vì nó không cần thiết và sai
-        /*
-         if (currentSeason != null) {
-            ...
-         }
-        */
 
         // Gán dữ liệu cho header
         leagueNameTextView.setText(leagueName);
@@ -110,7 +104,8 @@ public class LeagueDetailsFragment extends Fragment {
 
         // Setup ViewPager và TabLayout
         if (selectedSeasonObject != null) {
-            viewPager.setAdapter(new LeagueDetailsPagerAdapter(this, leagueId, selectedSeasonObject.getYear()));
+
+            viewPager.setAdapter(new LeagueDetailsPagerAdapter(this, leagueId, selectedSeasonObject));
         }
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
             switch (position) {
@@ -146,8 +141,11 @@ public class LeagueDetailsFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 selectedSeasonObject = allSeasons.get(allSeasons.size() - 1 - position);
+
                 updateSeasonUI(rootView, selectedSeasonObject);
-                viewPager.setAdapter(new LeagueDetailsPagerAdapter(LeagueDetailsFragment.this, leagueId, selectedSeasonObject.getYear()));
+
+                // SỬA Ở ĐÂY: Truyền cả đối tượng selectedSeasonObject
+                viewPager.setAdapter(new LeagueDetailsPagerAdapter(LeagueDetailsFragment.this, leagueId, selectedSeasonObject));
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {}

@@ -6,28 +6,24 @@ import java.io.Serializable;
 public class Match implements Serializable {
     @SerializedName("matchId")
     private int matchId;
-
     @SerializedName("league")
     private League league;
-
     @SerializedName("homeTeam")
     private Team homeTeam;
-
     @SerializedName("awayTeam")
     private Team awayTeam;
-
     @SerializedName("matchTime")
     private long matchTime;
-
     @SerializedName("status")
     private String status;
-
     @SerializedName("score")
     private Score score;
 
+    // THÊM TRƯỜNG MỚI
+    @SerializedName("round")
     private String round;
 
-    // --- CONSTRUCTOR MỚI ---
+    // SỬA LẠI CONSTRUCTOR ĐỂ NHẬN 8 THAM SỐ
     public Match(int matchId, League league, Team homeTeam, Team awayTeam, long matchTime, String status, Score score, String round) {
         this.matchId = matchId;
         this.league = league;
@@ -47,5 +43,5 @@ public class Match implements Serializable {
     public long getMatchTime() { return matchTime; }
     public String getStatus() { return status; }
     public Score getScore() { return score; }
-    public String getRound() { return round; }
+    public String getRound() { return round; } // THÊM GETTER
 }

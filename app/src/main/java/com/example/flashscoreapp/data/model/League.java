@@ -13,8 +13,11 @@ public class League implements Serializable {
     @SerializedName("logo")
     private String logoUrl;
 
-    public League(String name) {
+    // SỬA LẠI HÀM KHỞI TẠO ĐỂ NHẬN ĐỦ 3 THAM SỐ
+    public League(int id, String name, String logoUrl) {
+        this.id = id;
         this.name = name;
+        this.logoUrl = logoUrl;
     }
 
     // Getters
