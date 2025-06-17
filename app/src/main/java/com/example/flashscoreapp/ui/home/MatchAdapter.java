@@ -84,7 +84,7 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.MatchViewHol
     public static class MatchViewHolder extends RecyclerView.ViewHolder {
         private final TextView textViewStatus, textViewLeague, textViewHomeTeam, textViewAwayTeam, textViewScore;
         private final ImageView imageViewHomeLogo, imageViewAwayLogo;
-        private final ImageView imageViewFavorite;
+        public final ImageView imageViewFavorite;
 
         public MatchViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -96,7 +96,7 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.MatchViewHol
             imageViewHomeLogo = itemView.findViewById(R.id.image_view_home_logo);
             imageViewAwayLogo = itemView.findViewById(R.id.image_view_away_logo);
             imageViewFavorite = itemView.findViewById(R.id.image_view_favorite);
-            // --- QUAN TRỌNG: Không đặt setOnClickListener ở đây nữa ---
+
         }
 
         public void bind(Match match, boolean isFavorite) {

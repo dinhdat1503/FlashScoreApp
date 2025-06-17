@@ -15,12 +15,15 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.flashscoreapp.R;
+import com.example.flashscoreapp.data.model.domain.League;
 import com.example.flashscoreapp.ui.match_details.MatchDetailsActivity;
 import com.example.flashscoreapp.data.model.domain.Match;
 
 import java.text.SimpleDateFormat;
+import java.util.LinkedHashMap;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -32,7 +35,7 @@ public class HomeFragment extends Fragment {
     private HomeViewModel homeViewModel;
     private RecyclerView recyclerViewMatches;
     private RecyclerView recyclerViewDates;
-    private MatchAdapter matchAdapter;
+    private HomeGroupedAdapter homeGroupedAdapter;
     private DateAdapter dateAdapter;
     private ProgressBar progressBar;
     private TextView textNoMatches;
@@ -103,9 +106,9 @@ public class HomeFragment extends Fragment {
 
     private void setupRecyclerView(View view) {
         recyclerViewMatches = view.findViewById(R.id.recycler_view_matches);
-        matchAdapter = new MatchAdapter();
+        homeGroupedAdapter = new HomeGroupedAdapter();
 
-        matchAdapter.setOnItemClickListener(new MatchAdapter.OnItemClickListener() {
+        homeGroupedAdapter.setOnItemClickListener(new MatchAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(Match match) {
                 Intent intent = new Intent(getActivity(), MatchDetailsActivity.class);
@@ -123,7 +126,8 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        recyclerViewMatches.setAdapter(matchAdapter);
+
+        recyclerViewMatches.setAdapter(homeGroupedAdapter);
     }
 
     private void observeViewModel() {
@@ -132,17 +136,19 @@ public class HomeFragment extends Fragment {
         textNoMatches.setVisibility(View.GONE);
 
         homeViewModel.getMatches().observe(getViewLifecycleOwner(), matches -> {
-            // --- THÊM LOG TẠI ĐÂY ---
-            Log.d("FragmentLog", "Observer in Fragment triggered. Found " + (matches != null ? matches.size() : "null") + " matches.");
-
             progressBar.setVisibility(View.GONE);
             if (matches != null && !matches.isEmpty()) {
                 recyclerViewMatches.setVisibility(View.VISIBLE);
                 textNoMatches.setVisibility(View.GONE);
-                matchAdapter.setMatches(matches);
+
+                // Nhóm các trận đấu và cập nhật adapter
+                List<Object> groupedList = groupMatchesByLeague(matches);
+                homeGroupedAdapter.setDisplayList(groupedList);
+
             } else {
                 recyclerViewMatches.setVisibility(View.GONE);
                 textNoMatches.setVisibility(View.VISIBLE);
+                homeGroupedAdapter.setDisplayList(new ArrayList<>()); // Xóa dữ liệu cũ
             }
         });
 
@@ -151,8 +157,24 @@ public class HomeFragment extends Fragment {
                 Set<Integer> favoriteIds = favoriteMatches.stream()
                         .map(Match::getMatchId)
                         .collect(Collectors.toSet());
-                matchAdapter.setFavoriteMatchIds(favoriteIds);
+                homeGroupedAdapter.setFavoriteMatchIds(favoriteIds);
             }
         });
+    }
+
+    private List<Object> groupMatchesByLeague(List<Match> matches) {
+        Map<League, List<Match>> groupedMap = matches.stream()
+                .collect(Collectors.groupingBy(
+                        Match::getLeague,
+                        LinkedHashMap::new,
+                        Collectors.toList()
+                ));
+
+        List<Object> displayList = new ArrayList<>();
+        for (Map.Entry<League, List<Match>> entry : groupedMap.entrySet()) {
+            displayList.add(entry.getKey()); // Thêm tiêu đề giải đấu
+            displayList.addAll(entry.getValue()); // Thêm các trận đấu của giải đó
+        }
+        return displayList;
     }
 }

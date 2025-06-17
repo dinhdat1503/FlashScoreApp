@@ -13,6 +13,9 @@ public class ApiLeague implements Serializable {
     @SerializedName("round")
     private String round;
 
+    @SerializedName("country")
+    private String country;
+
     public int getId() {
         return id;
     }
@@ -25,4 +28,5 @@ public class ApiLeague implements Serializable {
     public String getRound() {
         return round;
     }
+    public String getCountry() { return country; }
 }

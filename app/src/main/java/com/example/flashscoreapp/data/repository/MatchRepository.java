@@ -175,7 +175,8 @@ public class MatchRepository {
                 League league = new League(
                         apiMatch.getLeague().getId(),
                         apiMatch.getLeague().getName(),
-                        apiMatch.getLeague().getLogo()
+                        apiMatch.getLeague().getLogo(),
+                        apiMatch.getLeague().getCountry()
                 );
 
                 // Tạo đối tượng Team với đầy đủ thông tin
@@ -203,11 +204,10 @@ public class MatchRepository {
                         matchTime,
                         apiMatch.getFixture().getStatus().getShortStatus(),
                         score,
-                        apiMatch.getLeague().getRound() // Lấy vòng đấu từ ApiLeague
+                        apiMatch.getLeague().getRound()
                 );
                 domainMatches.add(match);
             } catch (Exception e) {
-                // Bỏ qua trận đấu nếu có lỗi parse dữ liệu
                 e.printStackTrace();
             }
         }

@@ -25,6 +25,8 @@ public class MatchSummaryFragment extends Fragment {
     private MatchDetailsViewModel viewModel;
     private MatchEventAdapter eventAdapter;
     private LinearLayout statisticsContainer;
+    private TextView textReferee;
+    private TextView textStadium;
 
     @Nullable
     @Override
@@ -44,6 +46,8 @@ public class MatchSummaryFragment extends Fragment {
         eventAdapter = new MatchEventAdapter();
         recyclerViewEvents.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerViewEvents.setAdapter(eventAdapter);
+        textReferee = view.findViewById(R.id.text_referee);
+        textStadium = view.findViewById(R.id.text_stadium);
 
         // Lấy ViewModel từ Activity để chia sẻ dữ liệu
         viewModel = new ViewModelProvider(requireActivity()).get(MatchDetailsViewModel.class);
@@ -55,12 +59,21 @@ public class MatchSummaryFragment extends Fragment {
                 if (details.getStatistics() != null) {
                     displayStatisticsSummary(details.getStatistics());
                 }
-
                 // Hiển thị danh sách diễn biến trận đấu
                 if (details.getEvents() != null) {
                     Match currentMatch = ((MatchDetailsActivity) requireActivity()).getMatch();
                     int homeTeamId = currentMatch.getHomeTeam().getId();
                     eventAdapter.setData(details.getEvents(), homeTeamId);
+                }
+                if (details.getReferee() != null && !details.getReferee().isEmpty()) {
+                    textReferee.setText(details.getReferee());
+                } else {
+                    textReferee.setText("N/A");
+                }
+                if (details.getStadium() != null && !details.getStadium().isEmpty()) {
+                    textStadium.setText(details.getStadium());
+                } else {
+                    textStadium.setText("N/A");
                 }
             }
         });

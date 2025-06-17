@@ -62,7 +62,6 @@ public class MatchDetailsActivity extends AppCompatActivity {
             }
         }).attach();
 
-        observeMatchInfo();
     }
 
     private void updateScoreboard() {
@@ -86,26 +85,6 @@ public class MatchDetailsActivity extends AppCompatActivity {
         return true;
     }
 
-    private void observeMatchInfo() {
-        final TextView textReferee = findViewById(R.id.text_referee);
-        final TextView textStadium = findViewById(R.id.text_stadium);
-
-        viewModel.getMatchDetails().observe(this, details -> {
-            if (details != null) {
-                if (details.getReferee() != null && !details.getReferee().isEmpty()) {
-                    textReferee.setText(details.getReferee());
-                } else {
-                    textReferee.setText("N/A");
-                }
-
-                if (details.getStadium() != null && !details.getStadium().isEmpty()) {
-                    textStadium.setText(details.getStadium());
-                } else {
-                    textStadium.setText("N/A");
-                }
-            }
-        });
-    }
 
     public Match getMatch() { return this.match; }
 }

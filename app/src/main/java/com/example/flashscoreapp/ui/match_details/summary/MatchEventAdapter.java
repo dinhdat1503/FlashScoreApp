@@ -121,7 +121,6 @@ public class MatchEventAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             String minuteText = event.getMinute() + "'";
             textMinute.setText(minuteText);
 
-            // TODO: Xử lý hiển thị tên cầu thủ thay người chi tiết hơn ở đây
             String playerText = event.getPlayer();
             textPlayer.setText(playerText);
 
@@ -133,8 +132,10 @@ public class MatchEventAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 imageIcon.setImageResource(R.drawable.ic_yellow_card);
             } else if ("Red Card".equalsIgnoreCase(eventType)) {
                 imageIcon.setImageResource(R.drawable.ic_red_card);
-            } else { // "subst" và các loại khác
-                imageIcon.setImageResource(R.drawable.ic_leagues_24); // Tạm thời dùng icon thay người
+            } else if ("subst".equalsIgnoreCase(eventType)) {
+                imageIcon.setImageResource(R.drawable.ic_substitution);
+            } else {
+                imageIcon.setVisibility(View.GONE);
             }
         }
     }
