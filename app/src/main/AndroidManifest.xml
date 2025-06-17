@@ -24,7 +24,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.details.MatchDetailsActivity"
+        <activity android:name=".ui.match_details.MatchDetailsActivity"
             android:parentActivityName=".ui.MainActivity"/>
 
     </application>

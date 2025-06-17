@@ -7,7 +7,7 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 
-import com.example.flashscoreapp.data.model.FavoriteMatch;
+import com.example.flashscoreapp.data.model.local.FavoriteMatch;
 
 @Database(entities = {FavoriteMatch.class}, version = 1, exportSchema = false)
 @TypeConverters({Converters.class})

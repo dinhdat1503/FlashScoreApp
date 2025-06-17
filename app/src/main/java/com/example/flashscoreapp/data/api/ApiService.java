@@ -1,11 +1,11 @@
 package com.example.flashscoreapp.data.api;
 
-import com.example.flashscoreapp.data.model.ApiLeaguesResponse;
-import com.example.flashscoreapp.data.model.ApiMatch;
-import com.example.flashscoreapp.data.model.ApiResponse;
-import com.example.flashscoreapp.data.model.ApiStandingsResponse;
-import com.example.flashscoreapp.data.model.ApiStatisticsResponse;
-import com.example.flashscoreapp.data.model.ApiTopScorerData;
+import com.example.flashscoreapp.data.model.remote.ApiLeaguesResponse;
+import com.example.flashscoreapp.data.model.remote.ApiMatch;
+import com.example.flashscoreapp.data.model.remote.ApiResponse;
+import com.example.flashscoreapp.data.model.remote.ApiStandingsResponse;
+import com.example.flashscoreapp.data.model.remote.ApiStatisticsResponse;
+import com.example.flashscoreapp.data.model.remote.ApiTopScorerData;
 
 import retrofit2.Call;
 import retrofit2.http.GET;

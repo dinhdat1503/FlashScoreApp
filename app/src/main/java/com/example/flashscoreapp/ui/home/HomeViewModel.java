@@ -7,10 +7,9 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
-import com.example.flashscoreapp.data.model.Match;
+import com.example.flashscoreapp.data.model.domain.Match;
 import com.example.flashscoreapp.data.repository.MatchRepository;
-import com.example.flashscoreapp.data.model.FavoriteMatch;
-import com.example.flashscoreapp.data.model.Match;
+
 import java.util.List;
 
 public class HomeViewModel extends AndroidViewModel {

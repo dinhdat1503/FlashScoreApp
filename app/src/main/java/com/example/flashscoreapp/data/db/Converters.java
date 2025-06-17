@@ -1,7 +1,7 @@
 package com.example.flashscoreapp.data.db;
 
 import androidx.room.TypeConverter;
-import com.example.flashscoreapp.data.model.Match;
+import com.example.flashscoreapp.data.model.domain.Match;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;

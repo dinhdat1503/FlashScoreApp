@@ -1,19 +1,17 @@
 package com.example.flashscoreapp.ui;
 
 import android.os.Bundle;
-import android.view.MenuItem;
-import androidx.annotation.NonNull;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
 import com.example.flashscoreapp.R;
-import com.example.flashscoreapp.ui.home.FavoritesFragment;
+import com.example.flashscoreapp.ui.favorites.FavoritesFragment;
 import com.example.flashscoreapp.ui.home.HomeFragment;
-import com.example.flashscoreapp.ui.home.LeaguesFragment;
-import com.example.flashscoreapp.ui.home.SettingsFragment;
+import com.example.flashscoreapp.ui.leagues.LeaguesFragment;
+import com.example.flashscoreapp.ui.settings.SettingsFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationBarView;
 
 public class MainActivity extends AppCompatActivity {
 

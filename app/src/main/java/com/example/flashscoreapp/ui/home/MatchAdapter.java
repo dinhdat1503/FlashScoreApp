@@ -10,8 +10,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.flashscoreapp.R;
-import com.example.flashscoreapp.data.model.Match;
-import com.example.flashscoreapp.data.model.Score;
+import com.example.flashscoreapp.data.model.domain.Match;
+import com.example.flashscoreapp.data.model.domain.Score;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

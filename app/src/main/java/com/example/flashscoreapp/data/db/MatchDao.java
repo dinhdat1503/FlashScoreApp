@@ -7,8 +7,8 @@ import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 
-import com.example.flashscoreapp.data.model.FavoriteMatch;
-import com.example.flashscoreapp.data.model.Match;
+import com.example.flashscoreapp.data.model.local.FavoriteMatch;
+import com.example.flashscoreapp.data.model.domain.Match;
 
 import java.util.List;
 
