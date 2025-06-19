@@ -24,6 +24,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ui.team_details.TeamDetailsActivity"
+            android:exported="false" />
         <activity android:name=".ui.match_details.MatchDetailsActivity"
             android:parentActivityName=".ui.MainActivity"/>
         <activity
