@@ -8,6 +8,7 @@ import com.example.flashscoreapp.data.api.ApiService;
 import com.example.flashscoreapp.data.api.RetrofitClient;
 import com.example.flashscoreapp.data.db.AppDatabase;
 import com.example.flashscoreapp.data.db.MatchDao;
+import com.example.flashscoreapp.data.db.TeamDao;
 import com.example.flashscoreapp.data.model.domain.League;
 import com.example.flashscoreapp.data.model.domain.Match;
 import com.example.flashscoreapp.data.model.domain.MatchDetails;
@@ -17,6 +18,7 @@ import com.example.flashscoreapp.data.model.domain.Score;
 import com.example.flashscoreapp.data.model.domain.StandingItem;
 import com.example.flashscoreapp.data.model.domain.Team;
 import com.example.flashscoreapp.data.model.local.FavoriteMatch;
+import com.example.flashscoreapp.data.model.local.FavoriteTeam;
 import com.example.flashscoreapp.data.model.remote.ApiEvent;
 import com.example.flashscoreapp.data.model.remote.ApiLeagueData;
 import com.example.flashscoreapp.data.model.remote.ApiLeaguesResponse;
@@ -46,13 +48,16 @@ import retrofit2.Response;
 public class MatchRepository {
     private final ApiService apiService;
     private final MatchDao matchDao;
+    private final TeamDao teamDao;
     private final ExecutorService executorService;
     private final String API_KEY = "9603cad7a8mshaf2d58ef107a002p1f7706jsn62cf5be4f1d5";
     private final String API_HOST = "api-football-v1.p.rapidapi.com";
 
     public MatchRepository(Application application) {
         this.apiService = RetrofitClient.getApiService();
-        this.matchDao = AppDatabase.getDatabase(application).matchDao();
+        AppDatabase database = AppDatabase.getDatabase(application);
+        this.matchDao = database.matchDao();
+        this.teamDao = database.teamDao();
         this.executorService = Executors.newSingleThreadExecutor();
     }
 
@@ -70,6 +75,19 @@ public class MatchRepository {
         executorService.execute(() -> matchDao.removeFavorite(favoriteMatch));
     }
 
+    public LiveData<List<FavoriteTeam>> getAllFavoriteTeams() {
+        return teamDao.getAllFavoriteTeams();
+    }
+
+    public void addFavoriteTeam(Team team) {
+        FavoriteTeam favoriteTeam = new FavoriteTeam(team.getId());
+        executorService.execute(() -> teamDao.addFavorite(favoriteTeam));
+    }
+
+    public void removeFavoriteTeam(Team team) {
+        FavoriteTeam favoriteTeam = new FavoriteTeam(team.getId());
+        executorService.execute(() -> teamDao.removeFavorite(favoriteTeam));
+    }
     public LiveData<MatchDetails> getMatchDetailsFromApi(int matchId) {
         final MutableLiveData<MatchDetails> detailsData = new MutableLiveData<>();
         final MatchDetails combinedDetails = new MatchDetails(matchId, new ArrayList<>(), new ArrayList<>());
@@ -262,8 +280,8 @@ public class MatchRepository {
         return data;
     }
 
-    public LiveData<List<StandingItem>> getStandings(int leagueId, int season) {
-        final MutableLiveData<List<StandingItem>> data = new MutableLiveData<>();
+    public LiveData<List<List<StandingItem>>> getStandings(int leagueId, int season) {
+        final MutableLiveData<List<List<StandingItem>>> data = new MutableLiveData<>();
         apiService.getStandings(leagueId, season, API_KEY, API_HOST).enqueue(new Callback<ApiStandingsResponse>() {
             @Override
             public void onResponse(Call<ApiStandingsResponse> call, Response<ApiStandingsResponse> response) {
@@ -272,8 +290,9 @@ public class MatchRepository {
                         && response.body().getResponse().get(0).getLeague() != null
                         && !response.body().getResponse().get(0).getLeague().getStandings().isEmpty()) {
 
-                    List<StandingItem> standings = response.body().getResponse().get(0).getLeague().getStandings().get(0);
-                    data.postValue(standings);
+                    // Lấy về toàn bộ danh sách các bảng đấu
+                    List<List<StandingItem>> allStandings = response.body().getResponse().get(0).getLeague().getStandings();
+                    data.postValue(allStandings);
                 } else {
                     data.postValue(null);
                 }
@@ -299,6 +318,46 @@ public class MatchRepository {
             }
             @Override
             public void onFailure(Call<ApiResponse<ApiTopScorerData>> call, Throwable t) {
+                data.postValue(null);
+            }
+        });
+        return data;
+    }
+
+    public LiveData<List<Match>> getLiveMatchesFromApi() {
+        final MutableLiveData<List<Match>> data = new MutableLiveData<>();
+        // Gọi API với tham số live=all để lấy tất cả các trận đang diễn ra
+        apiService.getLiveFixtures("all", API_KEY, API_HOST).enqueue(new Callback<ApiResponse<ApiMatch>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<ApiMatch>> call, Response<ApiResponse<ApiMatch>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    data.postValue(convertApiMatchesToDomain(response.body().getResponse()));
+                } else {
+                    data.postValue(null);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<ApiMatch>> call, Throwable t) {
+                data.postValue(null);
+            }
+        });
+        return data;
+    }
+
+    public LiveData<List<Match>> getMatchesByDateRange(String fromDate, String toDate) {
+        final MutableLiveData<List<Match>> data = new MutableLiveData<>();
+        apiService.getFixturesByDateRange(fromDate, toDate, API_KEY, API_HOST).enqueue(new Callback<ApiResponse<ApiMatch>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<ApiMatch>> call, Response<ApiResponse<ApiMatch>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    data.postValue(convertApiMatchesToDomain(response.body().getResponse()));
+                } else {
+                    data.postValue(null);
+                }
+            }
+            @Override
+            public void onFailure(Call<ApiResponse<ApiMatch>> call, Throwable t) {
                 data.postValue(null);
             }
         });

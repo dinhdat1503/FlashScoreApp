@@ -9,7 +9,8 @@ import com.example.flashscoreapp.data.repository.MatchRepository;
 import java.util.List;
 
 public class StandingsViewModel extends AndroidViewModel {
-    private final LiveData<List<StandingItem>> standings;
+    // Sửa kiểu dữ liệu của LiveData
+    private final LiveData<List<List<StandingItem>>> standings;
 
     public StandingsViewModel(@NonNull Application application, int leagueId, int season) {
         super(application);
@@ -17,7 +18,8 @@ public class StandingsViewModel extends AndroidViewModel {
         standings = repository.getStandings(leagueId, season);
     }
 
-    public LiveData<List<StandingItem>> getStandings() {
+    // Sửa kiểu trả về của phương thức
+    public LiveData<List<List<StandingItem>>> getStandings() {
         return standings;
     }
 }

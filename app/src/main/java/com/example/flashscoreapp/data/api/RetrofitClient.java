@@ -4,7 +4,6 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitClient {
-    // URL cơ sở của API-Football
     private static final String BASE_URL = "https://api-football-v1.p.rapidapi.com/v3/";
     private static Retrofit retrofit = null;
 

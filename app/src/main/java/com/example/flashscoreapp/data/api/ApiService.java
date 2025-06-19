@@ -62,4 +62,19 @@ public interface ApiService {
             @Header("x-rapidapi-key") String apiKey,
             @Header("x-rapidapi-host") String apiHost
     );
+
+    @GET("fixtures")
+    Call<ApiResponse<ApiMatch>> getFixturesByDateRange(
+            @Query("from") String fromDate,
+            @Query("to") String toDate,
+            @Header("x-rapidapi-key") String apiKey,
+            @Header("x-rapidapi-host") String apiHost
+    );
+
+    @GET("fixtures")
+    Call<ApiResponse<ApiMatch>> getLiveFixtures(
+            @Query("live") String live,
+            @Header("x-rapidapi-key") String apiKey,
+            @Header("x-rapidapi-host") String apiHost
+    );
 }

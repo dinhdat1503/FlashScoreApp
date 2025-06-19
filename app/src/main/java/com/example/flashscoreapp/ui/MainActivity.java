@@ -10,6 +10,7 @@ import com.example.flashscoreapp.R;
 import com.example.flashscoreapp.ui.favorites.FavoritesFragment;
 import com.example.flashscoreapp.ui.home.HomeFragment;
 import com.example.flashscoreapp.ui.leagues.LeaguesFragment;
+import com.example.flashscoreapp.ui.live.LiveMatchesFragment;
 import com.example.flashscoreapp.ui.settings.SettingsFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -42,9 +43,9 @@ public class MainActivity extends AppCompatActivity {
             } else if (itemId == R.id.navigation_favorites) {
                 selectedFragment = new FavoritesFragment();
                 toolbar.setTitle("Favorites");
-            } else if (itemId == R.id.navigation_settings) {
-                selectedFragment = new SettingsFragment();
-                toolbar.setTitle("Settings");
+            } else if (itemId == R.id.navigation_live) {
+                selectedFragment = new LiveMatchesFragment();
+                toolbar.setTitle("Trực tiếp");
             }
 
             if (selectedFragment != null) {

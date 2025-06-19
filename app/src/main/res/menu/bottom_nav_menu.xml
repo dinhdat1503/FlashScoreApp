@@ -13,7 +13,7 @@
         android:icon="@drawable/ic_favorites_24"
         android:title="Yêu thích" />
     <item
-        android:id="@+id/navigation_settings"
-        android:icon="@drawable/ic_settings_24"
-        android:title="Cài đặt" />
+        android:id="@+id/navigation_live"
+        android:icon="@drawable/ic_live"
+        android:title="Trực tiếp" />
 </menu>

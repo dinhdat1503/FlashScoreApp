@@ -16,12 +16,15 @@ public class StandingItem {
     @SerializedName("goalsDiff")
     private int goalsDiff;
 
-    @SerializedName("all") // "all" chứa thông số tổng quát
+    @SerializedName("group")
+    private String group;
+    @SerializedName("all")
     private GameStats all;
 
     public int getRank() { return rank; }
     public ApiTeamInfo getTeam() { return team; }
     public int getPoints() { return points; }
     public int getGoalsDiff() { return goalsDiff; }
+    public String getGroup() { return group; }
     public GameStats getAll() { return all; }
 }

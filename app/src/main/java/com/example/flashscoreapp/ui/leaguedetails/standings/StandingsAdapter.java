@@ -1,5 +1,6 @@
 package com.example.flashscoreapp.ui.leaguedetails.standings;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,36 +11,72 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.flashscoreapp.R;
 import com.example.flashscoreapp.data.model.domain.StandingItem;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class StandingsAdapter extends RecyclerView.Adapter<StandingsAdapter.StandingViewHolder> {
+public class StandingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private List<StandingItem> standings = new ArrayList<>();
+    private static final int TYPE_HEADER = 0;
+    private static final int TYPE_ITEM = 1;
 
-    public void setStandings(List<StandingItem> standings) {
-        this.standings = standings;
+    private List<Object> displayList = new ArrayList<>();
+
+    @SuppressLint("NotifyDataSetChanged")
+    public void setDisplayList(List<Object> list) {
+        this.displayList = list;
         notifyDataSetChanged();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (displayList.get(position) instanceof String) {
+            return TYPE_HEADER;
+        }
+        return TYPE_ITEM;
     }
 
     @NonNull
     @Override
-    public StandingViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_standing, parent, false);
-        return new StandingViewHolder(view);
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        if (viewType == TYPE_HEADER) {
+            View view = inflater.inflate(R.layout.item_group_header, parent, false);
+            return new HeaderViewHolder(view);
+        } else {
+            View view = inflater.inflate(R.layout.item_standing, parent, false);
+            return new StandingViewHolder(view);
+        }
     }
 
     @Override
-    public void onBindViewHolder(@NonNull StandingViewHolder holder, int position) {
-        holder.bind(standings.get(position));
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        if (holder.getItemViewType() == TYPE_HEADER) {
+            ((HeaderViewHolder) holder).bind((String) displayList.get(position));
+        } else {
+            ((StandingViewHolder) holder).bind((StandingItem) displayList.get(position));
+        }
     }
 
     @Override
     public int getItemCount() {
-        return standings.size();
+        return displayList.size();
     }
 
-    class StandingViewHolder extends RecyclerView.ViewHolder {
+    // ViewHolder cho tiêu đề bảng
+    static class HeaderViewHolder extends RecyclerView.ViewHolder {
+        TextView textHeader;
+        public HeaderViewHolder(@NonNull View itemView) {
+            super(itemView);
+            textHeader = itemView.findViewById(R.id.text_group_header);
+        }
+        void bind(String title) {
+            textHeader.setText(title);
+        }
+    }
+
+    // ViewHolder cho từng đội
+    static class StandingViewHolder extends RecyclerView.ViewHolder {
         TextView textRank, textTeamName, textPlayed, text_goals_for_against, textPoints;
         ImageView imageTeamLogo;
 
@@ -57,11 +94,8 @@ public class StandingsAdapter extends RecyclerView.Adapter<StandingsAdapter.Stan
             textRank.setText(String.valueOf(item.getRank()));
             textTeamName.setText(item.getTeam().getName());
             textPlayed.setText(String.valueOf(item.getAll().getPlayed()));
-
-            // Hiển thị bàn thắng dạng "For:Against"
             String goals = item.getAll().getGoals().getGoalsFor() + ":" + item.getAll().getGoals().getGoalsAgainst();
             text_goals_for_against.setText(goals);
-
             textPoints.setText(String.valueOf(item.getPoints()));
             Glide.with(itemView.getContext()).load(item.getTeam().getLogo()).into(imageTeamLogo);
         }

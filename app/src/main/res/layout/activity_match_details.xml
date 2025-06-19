@@ -8,11 +8,12 @@
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="80dp">
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar_details"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
+            android:layout_height="80dp"
+            android:paddingTop="25dp"
             app:title="Chi tiết trận đấu"/>
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -29,13 +30,24 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp">
+                android:paddingHorizontal="24dp"
+                android:paddingVertical="16dp">
+
+                <ImageView
+                    android:id="@+id/image_favorite_home"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_star_empty"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/image_home_logo_details"
+                    app:layout_constraintBottom_toBottomOf="@id/image_home_logo_details"/>
 
                 <ImageView
                     android:id="@+id/image_home_logo_details"
                     android:layout_width="64dp"
                     android:layout_height="64dp"
-                    app:layout_constraintStart_toStartOf="parent"
+                    android:layout_marginStart="16dp"
+                    app:layout_constraintStart_toEndOf="@id/image_favorite_home"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:src="@tools:sample/avatars"/>
 
@@ -43,14 +55,13 @@
                     android:id="@+id/text_home_name_details"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="12dp"
                     android:gravity="center"
                     android:textStyle="bold"
-                    android:maxLines="2"
-                    app:layout_constraintTop_toBottomOf="@id/image_home_logo_details"
-                    app:layout_constraintStart_toStartOf="@id/image_home_logo_details"
                     app:layout_constraintEnd_toEndOf="@id/image_home_logo_details"
-                    tools:text="Manchester United"/>
+                    app:layout_constraintStart_toStartOf="@id/image_home_logo_details"
+                    app:layout_constraintTop_toBottomOf="@id/image_home_logo_details"
+                    tools:text="Manchester United" />
 
                 <TextView
                     android:id="@+id/text_score_details"
@@ -74,12 +85,21 @@
                     app:layout_constraintStart_toStartOf="@id/text_score_details"
                     app:layout_constraintEnd_toEndOf="@id/text_score_details"/>
 
+                <ImageView
+                    android:id="@+id/image_favorite_away"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_star_empty"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/image_away_logo_details"
+                    app:layout_constraintBottom_toBottomOf="@id/image_away_logo_details"/>
 
                 <ImageView
                     android:id="@+id/image_away_logo_details"
                     android:layout_width="64dp"
                     android:layout_height="64dp"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginEnd="16dp"
+                    app:layout_constraintEnd_toStartOf="@id/image_favorite_away"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:src="@tools:sample/avatars"/>
 
@@ -87,10 +107,9 @@
                     android:id="@+id/text_away_name_details"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="12dp"
                     android:gravity="center"
                     android:textStyle="bold"
-                    android:maxLines="2"
                     app:layout_constraintTop_toBottomOf="@id/image_away_logo_details"
                     app:layout_constraintStart_toStartOf="@id/image_away_logo_details"
                     app:layout_constraintEnd_toEndOf="@id/image_away_logo_details"

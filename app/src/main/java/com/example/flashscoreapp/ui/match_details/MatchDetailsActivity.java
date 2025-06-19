@@ -1,12 +1,12 @@
 package com.example.flashscoreapp.ui.match_details;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-// SỬA LỖI: Import đúng lớp Toolbar từ thư viện androidx
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
@@ -14,19 +14,25 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.bumptech.glide.Glide;
 import com.example.flashscoreapp.R;
 import com.example.flashscoreapp.data.model.domain.Match;
+import com.example.flashscoreapp.ui.home.HomeViewModel;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
 public class MatchDetailsActivity extends AppCompatActivity {
     private MatchDetailsViewModel viewModel;
+    private HomeViewModel homeViewModel;
     private Match match;
-
+    private ImageView favoriteIconHome, favoriteIconAway;
+    private boolean isHomeFavorite = false;
+    private boolean isAwayFavorite = false;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_match_details);
 
-        // SỬA LỖI: Sử dụng đúng kiểu androidx.appcompat.widget.Toolbar
         Toolbar toolbar = findViewById(R.id.toolbar_details);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
@@ -44,12 +50,15 @@ public class MatchDetailsActivity extends AppCompatActivity {
 
         MatchDetailsViewModelFactory factory = new MatchDetailsViewModelFactory(getApplication(), match.getMatchId());
         viewModel = new ViewModelProvider(this, factory).get(MatchDetailsViewModel.class);
+        homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
 
+        // Ánh xạ các biểu tượng yêu thích
+        favoriteIconHome = findViewById(R.id.image_favorite_home);
+        favoriteIconAway = findViewById(R.id.image_favorite_away);
         updateScoreboard();
 
         ViewPager2 viewPager = findViewById(R.id.view_pager_match_details);
         TabLayout tabLayout = findViewById(R.id.tab_layout_match_details);
-
         viewPager.setAdapter(new MatchDetailsPagerAdapter(this));
 
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
@@ -61,8 +70,27 @@ public class MatchDetailsActivity extends AppCompatActivity {
                 case 4: tab.setText("BẢNG XẾP HẠNG"); break;
             }
         }).attach();
+        observeFavoriteStatus();
+
+        favoriteIconHome.setOnClickListener(v -> {
+            if (isHomeFavorite) {
+                homeViewModel.removeFavoriteTeam(match.getHomeTeam());
+            } else {
+                homeViewModel.addFavoriteTeam(match.getHomeTeam());
+            }
+        });
+
+        favoriteIconAway.setOnClickListener(v -> {
+            if (isAwayFavorite) {
+                homeViewModel.removeFavoriteTeam(match.getAwayTeam());
+            } else {
+                homeViewModel.addFavoriteTeam(match.getAwayTeam());
+            }
+        });
 
     }
+
+
 
     private void updateScoreboard() {
         TextView homeName = findViewById(R.id.text_home_name_details);
@@ -71,14 +99,41 @@ public class MatchDetailsActivity extends AppCompatActivity {
         ImageView homeLogo = findViewById(R.id.image_home_logo_details);
         ImageView awayLogo = findViewById(R.id.image_away_logo_details);
 
-        homeName.setText(match.getHomeTeam().getName());
-        awayName.setText(match.getAwayTeam().getName());
+        // Định dạng lại tên đội nhà để xuống dòng
+        String originalHomeName = match.getHomeTeam().getName();
+        String formattedHomeName = originalHomeName.replaceFirst(" ", "\n");
+        homeName.setText(formattedHomeName);
+
+        // Định dạng lại tên đội khách để xuống dòng
+        String originalAwayName = match.getAwayTeam().getName();
+        String formattedAwayName = originalAwayName.replaceFirst(" ", "\n");
+        awayName.setText(formattedAwayName);
+
         score.setText(match.getScore().getHome() + " - " + match.getScore().getAway());
 
         Glide.with(this).load(match.getHomeTeam().getLogoUrl()).into(homeLogo);
         Glide.with(this).load(match.getAwayTeam().getLogoUrl()).into(awayLogo);
     }
 
+    private void updateFavoriteIcons() {
+        favoriteIconHome.setImageResource(isHomeFavorite ? R.drawable.ic_star_filled : R.drawable.ic_star_empty);
+        favoriteIconAway.setImageResource(isAwayFavorite ? R.drawable.ic_star_filled : R.drawable.ic_star_empty);
+    }
+
+    private void observeFavoriteStatus() {
+        homeViewModel.getFavoriteTeams().observe(this, favoriteTeams -> {
+            if (favoriteTeams != null && match != null) {
+                Set<Integer> favoriteTeamIds = favoriteTeams.stream()
+                        .map(ft -> ft.teamId)
+                        .collect(Collectors.toSet());
+
+                isHomeFavorite = favoriteTeamIds.contains(match.getHomeTeam().getId());
+                isAwayFavorite = favoriteTeamIds.contains(match.getAwayTeam().getId());
+
+                updateFavoriteIcons();
+            }
+        });
+    }
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();

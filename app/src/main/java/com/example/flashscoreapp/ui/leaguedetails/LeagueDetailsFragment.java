@@ -50,7 +50,7 @@ public class LeagueDetailsFragment extends Fragment {
         return fragment;
     }
 
-    // Phương thức onCreate này đã đúng, không cần sửa
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,7 +66,7 @@ public class LeagueDetailsFragment extends Fragment {
         }
     }
 
-    // Phương thức onCreateView này đã đúng, không cần sửa
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup c, @Nullable Bundle s) {
@@ -115,7 +115,7 @@ public class LeagueDetailsFragment extends Fragment {
         }).attach();
     }
 
-    // Phương thức này đã đúng, không cần sửa
+
     private void setupSeasonSpinner(View rootView, Spinner spinner, ViewPager2 viewPager) {
         if (allSeasons == null || allSeasons.isEmpty()) return;
 
@@ -123,7 +123,28 @@ public class LeagueDetailsFragment extends Fragment {
         int selectionIndex = 0;
         for (int i = 0; i < allSeasons.size(); i++) {
             Season s = allSeasons.get(i);
-            seasonYears.add(s.getYear() + "/" + (s.getYear() + 1));
+            String seasonString;
+
+            try {
+                // Lấy ra chuỗi năm từ ngày bắt đầu và kết thúc
+                String startYearStr = s.getStart().substring(0, 4);
+                String endYearStr = s.getEnd().substring(0, 4);
+
+                // So sánh hai năm
+                if (startYearStr.equals(endYearStr)) {
+                    // Nếu cùng năm, chỉ hiển thị một năm (VD: "2024")
+                    seasonString = startYearStr;
+                } else {
+                    // Nếu khác năm, hiển thị dạng YYYY/YYYY+1 (VD: "2024/2025")
+                    seasonString = s.getYear() + "/" + (s.getYear() + 1);
+                }
+            } catch (Exception e) {
+                // Phương án dự phòng nếu có lỗi
+                seasonString = s.getYear() + "/" + (s.getYear() + 1);
+            }
+
+            seasonYears.add(seasonString);
+
             if (selectedSeasonObject != null && s.getYear() == selectedSeasonObject.getYear()) {
                 selectionIndex = i;
             }
@@ -143,7 +164,6 @@ public class LeagueDetailsFragment extends Fragment {
 
                 updateSeasonUI(rootView, selectedSeasonObject);
 
-                // SỬA Ở ĐÂY: Truyền cả đối tượng selectedSeasonObject
                 viewPager.setAdapter(new LeagueDetailsPagerAdapter(LeagueDetailsFragment.this, leagueId, selectedSeasonObject));
             }
             @Override
@@ -151,7 +171,7 @@ public class LeagueDetailsFragment extends Fragment {
         });
     }
 
-    // Phương thức này đã đúng, không cần sửa
+
     private void updateSeasonUI(View rootView, Season season) {
         TextView textStartDate = rootView.findViewById(R.id.text_season_start_date);
         TextView textEndDate = rootView.findViewById(R.id.text_season_end_date);

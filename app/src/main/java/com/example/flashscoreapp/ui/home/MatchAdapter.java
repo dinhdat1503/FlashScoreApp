@@ -15,6 +15,7 @@ import com.example.flashscoreapp.data.model.domain.Score;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -101,21 +102,38 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.MatchViewHol
 
         public void bind(Match match, boolean isFavorite) {
             textViewStatus.setText(match.getStatus());
-            // Lỗi "Cannot resolve method 'getLeague' in 'Match'" và các lỗi tương tự được sửa ở đây,
-            // bằng cách đảm bảo các getter trong lớp Match là public.
+
             if(match.getLeague() != null) textViewLeague.setText(match.getLeague().getName());
             if(match.getHomeTeam() != null) textViewHomeTeam.setText(match.getHomeTeam().getName());
             if(match.getAwayTeam() != null) textViewAwayTeam.setText(match.getAwayTeam().getName());
 
-            if ("NS".equals(match.getStatus())) {
-                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
-                sdf.setTimeZone(java.util.TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
-                textViewScore.setText(sdf.format(new Date(match.getMatchTime())));
+            if ("NS".equals(match.getStatus())) { // "Not Started"
+                // Kiểm tra xem trận đấu có phải là hôm nay không
+                Calendar matchCal = Calendar.getInstance();
+                matchCal.setTimeInMillis(match.getMatchTime());
+                Calendar todayCal = Calendar.getInstance();
+                boolean isToday = todayCal.get(Calendar.YEAR) == matchCal.get(Calendar.YEAR) &&
+                        todayCal.get(Calendar.DAY_OF_YEAR) == matchCal.get(Calendar.DAY_OF_YEAR);
+
+                SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                timeFormat.setTimeZone(java.util.TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
+                String timeStr = timeFormat.format(new Date(match.getMatchTime()));
+
+                if (!isToday) {
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM", Locale.getDefault());
+                    String dateStr = dateFormat.format(new Date(match.getMatchTime()));
+                    textViewScore.setText(dateStr + "\n" + timeStr); // Hiển thị dạng "dd.MM" và giờ ở dòng dưới
+                    textViewScore.setTextSize(14f); // Giảm kích thước chữ cho phù hợp
+                } else {
+                    textViewScore.setText(timeStr); // Nếu là hôm nay, chỉ hiển thị giờ
+                    textViewScore.setTextSize(20f);
+                }
             } else {
                 Score score = match.getScore();
                 if(score != null) {
                     String scoreText = score.getHome() + " - " + score.getAway();
                     textViewScore.setText(scoreText);
+                    textViewScore.setTextSize(20f);
                 }
             }
 

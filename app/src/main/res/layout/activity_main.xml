@@ -9,13 +9,14 @@
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="85dp">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
+            android:layout_height="85dp"
             app:title="Today's Matches"
+            android:paddingTop="25dp"
             app:titleTextColor="@color/white"
             android:background="@color/backgroudTop"/>
 

@@ -8,6 +8,8 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 import com.example.flashscoreapp.data.model.domain.Match;
+import com.example.flashscoreapp.data.model.domain.Team;
+import com.example.flashscoreapp.data.model.local.FavoriteTeam;
 import com.example.flashscoreapp.data.repository.MatchRepository;
 
 import java.util.List;
@@ -18,12 +20,13 @@ public class HomeViewModel extends AndroidViewModel {
     private final MediatorLiveData<List<Match>> matches = new MediatorLiveData<>();
     private LiveData<List<Match>> currentDataSource;
     private final LiveData<List<Match>> favoriteMatches;
+    private final LiveData<List<FavoriteTeam>> favoriteTeams;
 
     public HomeViewModel(@NonNull Application application) {
         super(application);
         this.matchRepository = new MatchRepository(application);
-        // Lời gọi này giờ đã chính xác
         this.favoriteMatches = matchRepository.getAllFavoriteMatches();
+        this.favoriteTeams = matchRepository.getAllFavoriteTeams();
     }
 
     public LiveData<List<Match>> getFavoriteMatches() {
@@ -36,6 +39,18 @@ public class HomeViewModel extends AndroidViewModel {
 
     public void removeFavorite(Match match) {
         matchRepository.removeFavorite(match);
+    }
+
+    public LiveData<List<FavoriteTeam>> getFavoriteTeams() {
+        return favoriteTeams;
+    }
+
+    public void addFavoriteTeam(Team team) {
+        matchRepository.addFavoriteTeam(team);
+    }
+
+    public void removeFavoriteTeam(Team team) {
+        matchRepository.removeFavoriteTeam(team);
     }
     public void fetchMatchesForDate(String date) {
         LiveData<List<Match>> newDataSource = matchRepository.getMatchesByDateFromApi(date);

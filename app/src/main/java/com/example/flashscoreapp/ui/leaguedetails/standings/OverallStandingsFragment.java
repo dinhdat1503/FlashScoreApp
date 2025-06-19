@@ -11,8 +11,10 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.flashscoreapp.R;
+import com.example.flashscoreapp.data.model.domain.StandingItem;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class OverallStandingsFragment extends Fragment {
 
@@ -59,11 +61,21 @@ public class OverallStandingsFragment extends Fragment {
     }
 
     private void observeViewModel() {
-        standingsViewModel.getStandings().observe(getViewLifecycleOwner(), standings -> {
-            if (standings != null && !standings.isEmpty()) {
-                adapter.setStandings(standings);
+        standingsViewModel.getStandings().observe(getViewLifecycleOwner(), allGroups -> {
+            if (allGroups != null && !allGroups.isEmpty()) {
+                // Tạo một danh sách phẳng từ danh sách các bảng đấu
+                List<Object> displayList = new ArrayList<>();
+                for (List<StandingItem> group : allGroups) {
+                    if (group != null && !group.isEmpty()) {
+                        // Lấy tên bảng từ item đầu tiên
+                        displayList.add(group.get(0).getGroup());
+                        // Thêm tất cả các đội trong bảng đó
+                        displayList.addAll(group);
+                    }
+                }
+                adapter.setDisplayList(displayList);
             } else {
-                adapter.setStandings(new ArrayList<>());
+                adapter.setDisplayList(new ArrayList<>());
             }
         });
     }
