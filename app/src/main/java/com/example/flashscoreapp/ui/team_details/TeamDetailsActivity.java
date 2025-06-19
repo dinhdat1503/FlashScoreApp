@@ -1,4 +1,4 @@
-package com.example.flashscoreapp.ui.team_details; // Sửa lại package
+package com.example.flashscoreapp.ui.team_details;
 
 import android.os.Bundle;
 import android.widget.ImageView;
@@ -14,12 +14,6 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import java.util.Calendar;
 
-// Thêm và sửa lại các import
-import com.example.flashscoreapp.ui.team_details.TeamDetailsPagerAdapter;
-import com.example.flashscoreapp.ui.team_details.TeamDetailsViewModel;
-import com.example.flashscoreapp.ui.team_details.TeamDetailsViewModelFactory;
-
-
 public class TeamDetailsActivity extends AppCompatActivity {
 
     private TeamDetailsViewModel viewModel;
@@ -27,7 +21,6 @@ public class TeamDetailsActivity extends AppCompatActivity {
     private String teamName;
     private String teamLogoUrl;
 
-    // Thêm các hằng số để truyền dữ liệu qua Intent
     public static final String EXTRA_TEAM_ID = "TEAM_ID";
     public static final String EXTRA_TEAM_NAME = "TEAM_NAME";
     public static final String EXTRA_TEAM_LOGO = "TEAM_LOGO";
@@ -38,17 +31,15 @@ public class TeamDetailsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_team_details);
 
-        // 1. Lấy dữ liệu từ Intent
         teamId = getIntent().getIntExtra(EXTRA_TEAM_ID, 0);
         teamName = getIntent().getStringExtra(EXTRA_TEAM_NAME);
         teamLogoUrl = getIntent().getStringExtra(EXTRA_TEAM_LOGO);
 
         if (teamId == 0) {
-            finish(); // Đóng activity nếu không có teamId
+            finish();
             return;
         }
 
-        // 2. Cập nhật giao diện Header và Toolbar
         Toolbar toolbar = findViewById(R.id.toolbar_team_details);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
@@ -62,12 +53,12 @@ public class TeamDetailsActivity extends AppCompatActivity {
         teamNameTextView.setText(teamName);
         Glide.with(this).load(teamLogoUrl).placeholder(R.drawable.ic_leagues_24).into(teamLogoImageView);
 
-        // 3. Khởi tạo ViewModel
-        int currentSeasonYear = Calendar.getInstance().get(Calendar.YEAR) - 1; // Lấy mùa giải gần nhất, ví dụ 2023
+        // ⭐ SỬA LỖI Ở ĐÂY: Lấy năm hiện tại, không trừ đi 1
+        int currentSeasonYear = Calendar.getInstance().get(Calendar.YEAR);
+
         TeamDetailsViewModelFactory factory = new TeamDetailsViewModelFactory(getApplication(), teamId, currentSeasonYear);
         viewModel = new ViewModelProvider(this, factory).get(TeamDetailsViewModel.class);
 
-        // 4. Thiết lập ViewPager và TabLayout
         ViewPager2 viewPager = findViewById(R.id.view_pager_team_details);
         TabLayout tabLayout = findViewById(R.id.tab_layout_team_details);
 
@@ -88,7 +79,6 @@ public class TeamDetailsActivity extends AppCompatActivity {
             }
         }).attach();
 
-        // 5. Observe dữ liệu từ ViewModel và truyền vào Adapter
         viewModel.getMatchesForTeam().observe(this, pagerAdapter::setMatches);
     }
 

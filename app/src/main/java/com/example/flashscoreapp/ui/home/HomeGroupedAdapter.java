@@ -89,7 +89,8 @@ public class HomeGroupedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         return displayList.size();
     }
 
-    static class LeagueHeaderViewHolder extends RecyclerView.ViewHolder {
+    // ⭐ SỬA LỖI Ở ĐÂY: Thêm "public" vào trước "static class"
+    public static class LeagueHeaderViewHolder extends RecyclerView.ViewHolder {
         private final ImageView leagueLogo;
         private final TextView leagueName, leagueCountry;
 

@@ -1,6 +1,5 @@
-package com.example.flashscoreapp.ui.team_details; // Sửa lại package cho nhất quán
+package com.example.flashscoreapp.ui.team_details;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,19 +7,26 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.flashscoreapp.R;
+import com.example.flashscoreapp.data.model.domain.League;
 import com.example.flashscoreapp.data.model.domain.Match;
-import com.example.flashscoreapp.ui.home.MatchAdapter;
-import com.example.flashscoreapp.ui.match_details.MatchDetailsActivity;
+
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class TeamMatchesFragment extends Fragment {
 
     private static final String ARG_MATCHES = "arg_matches";
     private List<Match> matches;
+    private TeamDetailsViewModel viewModel;
 
     public static TeamMatchesFragment newInstance(List<Match> matches) {
         TeamMatchesFragment fragment = new TeamMatchesFragment();
@@ -36,6 +42,8 @@ public class TeamMatchesFragment extends Fragment {
         if (getArguments() != null) {
             matches = (List<Match>) getArguments().getSerializable(ARG_MATCHES);
         }
+        // Lấy ViewModel từ Activity cha
+        viewModel = new ViewModelProvider(requireActivity()).get(TeamDetailsViewModel.class);
     }
 
     @Nullable
@@ -49,23 +57,31 @@ public class TeamMatchesFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         RecyclerView recyclerView = view.findViewById(R.id.main_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        MatchAdapter adapter = new MatchAdapter(); // Tái sử dụng MatchAdapter
+
+        // Lấy teamId từ Activity để truyền vào Adapter
+        int teamId = requireActivity().getIntent().getIntExtra(TeamDetailsActivity.EXTRA_TEAM_ID, 0);
+        TeamMatchesGroupedAdapter adapter = new TeamMatchesGroupedAdapter(teamId);
         recyclerView.setAdapter(adapter);
-        adapter.setMatches(matches);
 
-        // THAY THẾ LAMBDA BẰNG LỚP NẶC DANH
-        adapter.setOnItemClickListener(new MatchAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(Match match) {
-                Intent intent = new Intent(getActivity(), MatchDetailsActivity.class);
-                intent.putExtra("EXTRA_MATCH", match);
-                startActivity(intent);
-            }
+        if (matches != null && !matches.isEmpty()) {
+            List<Object> groupedList = groupMatchesByLeague(matches);
+            adapter.setDisplayList(groupedList);
+        }
+    }
 
-            @Override
-            public void onFavoriteClick(Match match, boolean isFavorite) {
-                // Không cần xử lý sự kiện yêu thích trong fragment này, nên để trống
-            }
-        });
+    private List<Object> groupMatchesByLeague(List<Match> matches) {
+        Map<League, List<Match>> groupedMap = matches.stream()
+                .collect(Collectors.groupingBy(
+                        Match::getLeague,
+                        LinkedHashMap::new,
+                        Collectors.toList()
+                ));
+
+        List<Object> displayList = new ArrayList<>();
+        for (Map.Entry<League, List<Match>> entry : groupedMap.entrySet()) {
+            displayList.add(entry.getKey());
+            displayList.addAll(entry.getValue());
+        }
+        return displayList;
     }
 }
