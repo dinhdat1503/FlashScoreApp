@@ -15,8 +15,9 @@ import com.example.flashscoreapp.R;
 import com.example.flashscoreapp.data.model.domain.League;
 import com.example.flashscoreapp.data.model.domain.Match;
 
-import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Calendar; // Thêm import này
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,14 +25,15 @@ import java.util.stream.Collectors;
 
 public class TeamMatchesFragment extends Fragment {
 
-    private static final String ARG_MATCHES = "arg_matches";
-    private List<Match> matches;
+    private static final String ARG_IS_RESULTS = "arg_is_results";
+    private boolean isResults;
     private TeamDetailsViewModel viewModel;
+    private TeamMatchesGroupedAdapter adapter;
 
-    public static TeamMatchesFragment newInstance(List<Match> matches) {
+    public static TeamMatchesFragment newInstance(boolean isResults) {
         TeamMatchesFragment fragment = new TeamMatchesFragment();
         Bundle args = new Bundle();
-        args.putSerializable(ARG_MATCHES, (Serializable) matches);
+        args.putBoolean(ARG_IS_RESULTS, isResults);
         fragment.setArguments(args);
         return fragment;
     }
@@ -40,9 +42,8 @@ public class TeamMatchesFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            matches = (List<Match>) getArguments().getSerializable(ARG_MATCHES);
+            isResults = getArguments().getBoolean(ARG_IS_RESULTS);
         }
-        // Lấy ViewModel từ Activity cha
         viewModel = new ViewModelProvider(requireActivity()).get(TeamDetailsViewModel.class);
     }
 
@@ -58,15 +59,49 @@ public class TeamMatchesFragment extends Fragment {
         RecyclerView recyclerView = view.findViewById(R.id.main_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // Lấy teamId từ Activity để truyền vào Adapter
         int teamId = requireActivity().getIntent().getIntExtra(TeamDetailsActivity.EXTRA_TEAM_ID, 0);
-        TeamMatchesGroupedAdapter adapter = new TeamMatchesGroupedAdapter(teamId);
+        adapter = new TeamMatchesGroupedAdapter(teamId);
         recyclerView.setAdapter(adapter);
 
-        if (matches != null && !matches.isEmpty()) {
-            List<Object> groupedList = groupMatchesByLeague(matches);
-            adapter.setDisplayList(groupedList);
-        }
+        viewModel.getMatchesForTeam().observe(getViewLifecycleOwner(), allMatches -> {
+            if (allMatches != null) {
+                List<Match> filteredAndSortedMatches;
+
+                // Lấy thời điểm đầu ngày hôm nay để so sánh
+                Calendar cal = Calendar.getInstance();
+                cal.set(Calendar.HOUR_OF_DAY, 0);
+                cal.set(Calendar.MINUTE, 0);
+                cal.set(Calendar.SECOND, 0);
+                cal.set(Calendar.MILLISECOND, 0);
+                long todayStartTimestamp = cal.getTimeInMillis();
+
+                if (isResults) {
+                    // Lọc và sắp xếp các trận KẾT QUẢ (gần nhất -> xa nhất)
+                    filteredAndSortedMatches = allMatches.stream()
+                            .filter(match -> "FT".equals(match.getStatus()))
+                            .sorted(Comparator.comparingLong(Match::getMatchTime).reversed())
+                            .collect(Collectors.toList());
+                } else {
+                    // Lọc và sắp xếp các trận LỊCH THI ĐẤU (sắp tới -> xa hơn)
+                    filteredAndSortedMatches = allMatches.stream()
+                            // Điều kiện 1: Trận đấu chưa kết thúc
+                            .filter(match -> !"FT".equals(match.getStatus()))
+                            // Điều kiện 2 (MỚI): Ngày thi đấu phải từ hôm nay trở đi
+                            .filter(match -> match.getMatchTime() >= todayStartTimestamp)
+                            .sorted(Comparator.comparingLong(Match::getMatchTime))
+                            .collect(Collectors.toList());
+                }
+
+                if (!filteredAndSortedMatches.isEmpty()) {
+                    List<Object> groupedList = groupMatchesByLeague(filteredAndSortedMatches);
+                    adapter.setDisplayList(groupedList);
+                } else {
+                    adapter.setDisplayList(new ArrayList<>());
+                }
+            } else {
+                adapter.setDisplayList(new ArrayList<>());
+            }
+        });
     }
 
     private List<Object> groupMatchesByLeague(List<Match> matches) {
