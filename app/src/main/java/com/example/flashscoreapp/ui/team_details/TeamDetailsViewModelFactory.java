@@ -1,33 +1,27 @@
-package com.example.flashscoreapp.ui.team_details;
+package com.example.flashscoreapp.ui.teamdetails;
 
+import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.flashscoreapp.data.api.RetrofitClient;
-import com.example.flashscoreapp.data.repository.TeamRepository;
-
-/**
- * Factory để khởi tạo TeamDetailsViewModel, cho phép truyền tham số teamId vào constructor.
- */
-public final class TeamDetailsViewModelFactory implements ViewModelProvider.Factory {
+public class TeamDetailsViewModelFactory implements ViewModelProvider.Factory {
+    private final Application application;
     private final int teamId;
+    private final int seasonYear;
 
-    public TeamDetailsViewModelFactory(final int teamId) {
+    public TeamDetailsViewModelFactory(Application application, int teamId, int seasonYear) {
+        this.application = application;
         this.teamId = teamId;
+        this.seasonYear = seasonYear;
     }
 
     @NonNull
     @Override
-    public <T extends ViewModel> T create(@NonNull final Class<T> modelClass) {
+    public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
         if (modelClass.isAssignableFrom(TeamDetailsViewModel.class)) {
-            // ĐÃ SỬA: Giả sử phương thức đúng là .getApiService() thay vì .getInstance().getApiService()
-            final TeamRepository teamRepository = new TeamRepository(RetrofitClient.getApiService());
-
-            @SuppressWarnings("unchecked")
-            final T viewModel = (T) new TeamDetailsViewModel(teamRepository, teamId);
-            return viewModel;
+            return (T) new TeamDetailsViewModel(application, teamId, seasonYear);
         }
-        throw new IllegalArgumentException("Unknown ViewModel class: " + modelClass.getName());
+        throw new IllegalArgumentException("Unknown ViewModel class");
     }
 }

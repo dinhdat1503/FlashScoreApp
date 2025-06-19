@@ -1,34 +1,25 @@
-package com.example.flashscoreapp.ui.team_details;
+package com.example.flashscoreapp.ui.teamdetails;
 
+import android.app.Application;
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.ViewModel;
-
-import com.example.flashscoreapp.data.model.domain.Player;
-import com.example.flashscoreapp.data.repository.TeamRepository;
-
+import com.example.flashscoreapp.data.model.domain.Match;
+import com.example.flashscoreapp.data.repository.MatchRepository;
 import java.util.List;
 
-/**
- * ViewModel chịu trách nhiệm cung cấp dữ liệu cho TeamDetailsActivity và các Fragment con.
- */
-public final class TeamDetailsViewModel extends ViewModel {
-    private final TeamRepository teamRepository;
-    private final int teamId;
+public class TeamDetailsViewModel extends AndroidViewModel {
+    private final MatchRepository repository;
+    private final LiveData<List<Match>> matchesForTeam;
 
-    private final LiveData<List<Player>> squad;
-
-    public TeamDetailsViewModel(final TeamRepository teamRepository, final int teamId) {
-        this.teamRepository = teamRepository;
-        this.teamId = teamId;
-        this.squad = teamRepository.getSquad(teamId);
+    public TeamDetailsViewModel(@NonNull Application application, int teamId, int seasonYear) {
+        super(application);
+        repository = new MatchRepository(application);
+        matchesForTeam = repository.getMatchesForTeam(teamId, seasonYear);
+        // Sẽ thêm các LiveData khác cho đội hình, bxh... ở đây
     }
 
-    /**
-     * Cung cấp LiveData chứa danh sách đội hình.
-     * UI sẽ quan sát (observe) LiveData này để nhận cập nhật.
-     * @return LiveData chứa danh sách cầu thủ.
-     */
-    public LiveData<List<Player>> getSquad() {
-        return squad;
+    public LiveData<List<Match>> getMatchesForTeam() {
+        return matchesForTeam;
     }
 }

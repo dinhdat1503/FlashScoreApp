@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors; // Đảm bảo có import này
 
-public class FavoriteTeamsFragment extends Fragment {
+public class    FavoriteTeamsFragment extends Fragment {
 
     private FavoritesViewModel viewModel;
     private HomeGroupedAdapter groupedAdapter;
@@ -80,7 +80,7 @@ public class FavoriteTeamsFragment extends Fragment {
                 .collect(Collectors.groupingBy(
                         Match::getLeague,
                         LinkedHashMap::new,
-                        Collectors.toList() // Thay ArrayList::new bằng Collectors.toList()
+                        Collectors.toList() // Đã sửa: Sử dụng Collectors.toList()
                 ));
         List<Object> displayList = new ArrayList<>();
         for (Map.Entry<League, List<Match>> entry : groupedMap.entrySet()) {

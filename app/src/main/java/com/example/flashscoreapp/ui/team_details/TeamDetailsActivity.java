@@ -1,80 +1,90 @@
-package com.example.flashscoreapp.ui.team_details;
+package com.example.flashscoreapp.ui.teamdetails;
 
 import android.os.Bundle;
-import androidx.annotation.NonNull;
+import android.widget.ImageView;
+import android.widget.TextView;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
-
+import com.bumptech.glide.Glide;
 import com.example.flashscoreapp.R;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
+import java.util.Calendar;
 
-/**
- * Activity chính để hiển thị màn hình chi tiết đội bóng với các tab thông tin.
- */
-public final class TeamDetailsActivity extends AppCompatActivity {
+public class TeamDetailsActivity extends AppCompatActivity {
 
-    public static final String EXTRA_TEAM_ID = "EXTRA_TEAM_ID";
-    public static final String EXTRA_TEAM_NAME = "EXTRA_TEAM_NAME";
+    private TeamDetailsViewModel viewModel;
+    private int teamId;
+    private String teamName;
+    private String teamLogoUrl;
 
     @Override
-    protected void onCreate(final Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_team_details);
 
-        final int teamId = getIntent().getIntExtra(EXTRA_TEAM_ID, -1);
-        final String teamName = getIntent().getStringExtra(EXTRA_TEAM_NAME);
+        // 1. Lấy dữ liệu từ Intent
+        teamId = getIntent().getIntExtra("TEAM_ID", 0);
+        teamName = getIntent().getStringExtra("TEAM_NAME");
+        teamLogoUrl = getIntent().getStringExtra("TEAM_LOGO");
 
-        if (teamId == -1) {
-            // Không có ID hợp lệ, không thể tiếp tục.
-            finish();
+        if (teamId == 0) {
+            finish(); // Đóng activity nếu không có teamId
             return;
         }
 
-        setupToolbar(teamName);
-        setupViewModel(teamId);
-        setupViewPagerAndTabs();
-    }
-
-    private void setupToolbar(final String teamName) {
-        final Toolbar toolbar = findViewById(R.id.toolbar_team_details);
+        // 2. Cập nhật giao diện Header và Toolbar
+        Toolbar toolbar = findViewById(R.id.toolbar_team_details);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle(teamName);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
-            getSupportActionBar().setTitle(teamName != null ? teamName : "Chi tiết đội bóng");
         }
-        toolbar.setNavigationOnClickListener(v -> finish()); // Sử dụng finish() thay vì onBackPressed()
-    }
 
-    private void setupViewModel(final int teamId) {
-        final TeamDetailsViewModelFactory factory = new TeamDetailsViewModelFactory(teamId);
-        // ViewModel được gắn với vòng đời của Activity này.
-        final TeamDetailsViewModel viewModel = new ViewModelProvider(this, factory).get(TeamDetailsViewModel.class);
-    }
+        ImageView teamLogoImageView = findViewById(R.id.image_team_logo_details);
+        TextView teamNameTextView = findViewById(R.id.text_team_name_details);
 
-    private void setupViewPagerAndTabs() {
-        final ViewPager2 viewPager = findViewById(R.id.view_pager_team_details);
-        final TabLayout tabLayout = findViewById(R.id.tab_layout_team_details);
-        final TeamDetailsPagerAdapter pagerAdapter = new TeamDetailsPagerAdapter(this);
+        teamNameTextView.setText(teamName);
+        Glide.with(this).load(teamLogoUrl).placeholder(R.drawable.ic_leagues_24).into(teamLogoImageView);
+
+        // 3. Khởi tạo ViewModel
+        int currentSeasonYear = Calendar.getInstance().get(Calendar.YEAR) - 1; // Lấy mùa giải gần nhất, ví dụ 2023
+        TeamDetailsViewModelFactory factory = new TeamDetailsViewModelFactory(getApplication(), teamId, currentSeasonYear);
+        viewModel = new ViewModelProvider(this, factory).get(TeamDetailsViewModel.class);
+
+        // 4. Thiết lập ViewPager và TabLayout
+        ViewPager2 viewPager = findViewById(R.id.view_pager_team_details);
+        TabLayout tabLayout = findViewById(R.id.tab_layout_team_details);
+
+        TeamDetailsPagerAdapter pagerAdapter = new TeamDetailsPagerAdapter(this, viewModel);
         viewPager.setAdapter(pagerAdapter);
 
-        // Kết nối TabLayout với ViewPager
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
-            tab.setText(getTabTitle(position));
+            switch (position) {
+                case 0:
+                    tab.setText("KẾT QUẢ");
+                    break;
+                case 1:
+                    tab.setText("LỊCH THI ĐẤU");
+                    break;
+                case 2:
+                    tab.setText("ĐỘI HÌNH");
+                    break;
+            }
         }).attach();
+
+        // 5. Observe dữ liệu từ ViewModel và truyền vào Adapter
+        viewModel.getMatchesForTeam().observe(this, matches -> {
+            pagerAdapter.setMatches(matches);
+        });
     }
 
-    private String getTabTitle(final int position) {
-        switch (position) {
-            case 0:
-            default:
-                return "Đội hình";
-            // case 1: return "Kết quả";
-            // case 2: return "Lịch thi đấu";
-            // case 3: return "Bảng xếp hạng";
-        }
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 }

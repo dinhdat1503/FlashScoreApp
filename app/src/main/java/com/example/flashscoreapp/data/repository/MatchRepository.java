@@ -363,4 +363,23 @@ public class MatchRepository {
         });
         return data;
     }
+
+    public LiveData<List<Match>> getMatchesForTeam(int teamId, int seasonYear) {
+        final MutableLiveData<List<Match>> data = new MutableLiveData<>();
+        apiService.getFixturesForTeam(teamId, seasonYear, API_KEY, API_HOST).enqueue(new Callback<ApiResponse<ApiMatch>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<ApiMatch>> call, Response<ApiResponse<ApiMatch>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    data.postValue(convertApiMatchesToDomain(response.body().getResponse()));
+                } else {
+                    data.postValue(null);
+                }
+            }
+            @Override
+            public void onFailure(Call<ApiResponse<ApiMatch>> call, Throwable t) {
+                data.postValue(null);
+            }
+        });
+        return data;
+    }
 }

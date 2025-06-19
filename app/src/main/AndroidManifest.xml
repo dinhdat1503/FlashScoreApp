@@ -32,7 +32,9 @@
         <activity
             android:name=".ui.settings.SettingsActivity"
             android:parentActivityName=".ui.MainActivity" />
-
+        <activity
+            android:name=".ui.teamdetails.TeamDetailsActivity"
+            android:parentActivityName=".ui.match_details.MatchDetailsActivity" />
     </application>
 
 </manifest>

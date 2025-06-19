@@ -89,4 +89,12 @@ public interface ApiService {
             @Header("x-rapidapi-key") String apiKey,
             @Header("x-rapidapi-host") String apiHost
     );
+
+    @GET("fixtures")
+    Call<ApiResponse<ApiMatch>> getFixturesForTeam(
+            @Query("team") int teamId,
+            @Query("season") int seasonYear,
+            @Header("x-rapidapi-key") String apiKey,
+            @Header("x-rapidapi-host") String apiHost
+    );
 }
