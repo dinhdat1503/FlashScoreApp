@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingVertical="8dp">
+
+        <TextView style="@style/SettingsHeader" android:text="Thông báo push" />
+        <TextView style="@style/SettingsItem" android:drawableStart="@drawable/ic_notifications_24" android:text="Thiết lập thông báo" />
+
+        <TextView style="@style/SettingsHeader" android:text="Người dùng" />
+        <RelativeLayout style="@style/SettingsItemContainer">
+            <TextView style="@style/SettingsItem.Title" android:drawableStart="@drawable/ic_person" android:text="Chưa đăng nhập" />
+            <Button style="@style/Widget.AppCompat.Button.Colored" android:layout_width="wrap_content" android:layout_height="40dp" android:layout_alignParentEnd="true" android:text="Đăng nhập" />
+        </RelativeLayout>
+
+        <TextView style="@style/SettingsHeader" android:text="Giao diện" />
+        <RelativeLayout style="@style/SettingsItemContainer">
+            <TextView style="@style/SettingsItem.Title" android:drawableStart="@drawable/ic_lightdark" android:text="Chế độ sáng / Chế độ tối" />
+            <TextView style="@style/SettingsItem.Value" android:text="Hệ thống" />
+        </RelativeLayout>
+
+        <TextView style="@style/SettingsHeader" android:text="Khác" />
+        <TextView style="@style/SettingsItem" android:drawableStart="@drawable/ic_language" android:text="Thay đổi ngôn ngữ" />
+        <TextView style="@style/SettingsItem" android:drawableStart="@drawable/ic_email" android:text="Gửi cho chúng tôi ý kiến phản hồi" />
+        <TextView style="@style/SettingsItem" android:drawableStart="@drawable/ic_page" android:text="Điều khoản Sử dụng" />
+        <TextView style="@style/SettingsItem" android:drawableStart="@drawable/ic_page" android:text="Chính sách bảo mật" />
+
+        <RelativeLayout style="@style/SettingsItemContainer">
+            <TextView style="@style/SettingsItem.Title" android:text="Phiên bản" />
+            <TextView style="@style/SettingsItem.Value" android:text="1.0.0" />
+        </RelativeLayout>
+
+    </LinearLayout>
+</ScrollView>

@@ -6,4 +6,48 @@
     </style>
 
     <style name="Theme.FlashScoreApp" parent="Base.Theme.FlashScoreApp" />
+
+    <style name="SettingsHeader">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/selected_date_color</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="SettingsItemContainer">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+    </style>
+
+    <style name="SettingsItem" parent="android:Widget.TextView">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:drawablePadding">16dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+        <item name="android:drawableEnd">@drawable/ic_arrow_right_24</item> </style>
+
+    <style name="SettingsItem.Title" parent="android:Widget.TextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:drawablePadding">16dp</item>
+        <item name="android:gravity">center_vertical</item>
+    </style>
+
+    <style name="SettingsItem.Value" parent="android:Widget.TextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_alignParentEnd">true</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+    </style>
 </resources>
