@@ -53,15 +53,14 @@ public class TeamDetailsActivity extends AppCompatActivity {
         teamNameTextView.setText(teamName);
         Glide.with(this).load(teamLogoUrl).placeholder(R.drawable.ic_leagues_24).into(teamLogoImageView);
 
-        int currentSeasonYear = Calendar.getInstance().get(Calendar.YEAR);
-
-        TeamDetailsViewModelFactory factory = new TeamDetailsViewModelFactory(getApplication(), teamId, currentSeasonYear);
+        // --- BỎ HOÀN TOÀN VIỆC TÍNH TOÁN VÀ SỬ DỤNG seasonYear ---
+        // Khởi tạo factory mới chỉ với teamId
+        TeamDetailsViewModelFactory factory = new TeamDetailsViewModelFactory(getApplication(), teamId);
         viewModel = new ViewModelProvider(this, factory).get(TeamDetailsViewModel.class);
 
         ViewPager2 viewPager = findViewById(R.id.view_pager_team_details);
         TabLayout tabLayout = findViewById(R.id.tab_layout_team_details);
 
-        // Sửa đổi ở đây: không cần truyền viewModel vào adapter nữa
         TeamDetailsPagerAdapter pagerAdapter = new TeamDetailsPagerAdapter(this);
         viewPager.setAdapter(pagerAdapter);
 
@@ -78,9 +77,6 @@ public class TeamDetailsActivity extends AppCompatActivity {
                     break;
             }
         }).attach();
-
-        // Xóa bỏ dòng observe này
-        // viewModel.getMatchesForTeam().observe(this, pagerAdapter::setMatches);
     }
 
     @Override

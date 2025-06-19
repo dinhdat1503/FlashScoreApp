@@ -364,9 +364,12 @@ public class MatchRepository {
         return data;
     }
 
-    public LiveData<List<Match>> getMatchesForTeam(int teamId, int seasonYear) {
+    // --- PHẦN ĐƯỢC SỬA ---
+    // Thay thế seasonYear bằng fromDate và toDate
+    public LiveData<List<Match>> getMatchesForTeam(int teamId, String fromDate, String toDate) {
         final MutableLiveData<List<Match>> data = new MutableLiveData<>();
-        apiService.getFixturesForTeam(teamId, seasonYear, API_KEY, API_HOST).enqueue(new Callback<ApiResponse<ApiMatch>>() {
+        // Gọi đến ApiService đã được cập nhật
+        apiService.getFixturesForTeam(teamId, fromDate, toDate, API_KEY, API_HOST).enqueue(new Callback<ApiResponse<ApiMatch>>() {
             @Override
             public void onResponse(Call<ApiResponse<ApiMatch>> call, Response<ApiResponse<ApiMatch>> response) {
                 if (response.isSuccessful() && response.body() != null) {

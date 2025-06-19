@@ -90,10 +90,12 @@ public interface ApiService {
             @Header("x-rapidapi-host") String apiHost
     );
 
+    // --- PHẦN ĐƯỢC SỬA ---
     @GET("fixtures")
     Call<ApiResponse<ApiMatch>> getFixturesForTeam(
             @Query("team") int teamId,
-            @Query("season") int seasonYear,
+            @Query("from") String fromDate,
+            @Query("to") String toDate,
             @Header("x-rapidapi-key") String apiKey,
             @Header("x-rapidapi-host") String apiHost
     );
