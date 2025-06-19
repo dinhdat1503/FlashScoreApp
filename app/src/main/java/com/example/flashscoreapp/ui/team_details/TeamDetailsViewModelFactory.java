@@ -1,4 +1,4 @@
-package com.example.flashscoreapp.ui.teamdetails;
+package com.example.flashscoreapp.ui.team_details; // Sửa lại package
 
 import android.app.Application;
 import androidx.annotation.NonNull;

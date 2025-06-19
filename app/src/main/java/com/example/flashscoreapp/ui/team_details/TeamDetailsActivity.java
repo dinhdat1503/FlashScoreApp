@@ -1,4 +1,4 @@
-package com.example.flashscoreapp.ui.teamdetails;
+package com.example.flashscoreapp.ui.team_details; // Sửa lại package
 
 import android.os.Bundle;
 import android.widget.ImageView;
@@ -14,6 +14,12 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import java.util.Calendar;
 
+// Thêm và sửa lại các import
+import com.example.flashscoreapp.ui.team_details.TeamDetailsPagerAdapter;
+import com.example.flashscoreapp.ui.team_details.TeamDetailsViewModel;
+import com.example.flashscoreapp.ui.team_details.TeamDetailsViewModelFactory;
+
+
 public class TeamDetailsActivity extends AppCompatActivity {
 
     private TeamDetailsViewModel viewModel;
@@ -21,15 +27,21 @@ public class TeamDetailsActivity extends AppCompatActivity {
     private String teamName;
     private String teamLogoUrl;
 
+    // Thêm các hằng số để truyền dữ liệu qua Intent
+    public static final String EXTRA_TEAM_ID = "TEAM_ID";
+    public static final String EXTRA_TEAM_NAME = "TEAM_NAME";
+    public static final String EXTRA_TEAM_LOGO = "TEAM_LOGO";
+
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_team_details);
 
         // 1. Lấy dữ liệu từ Intent
-        teamId = getIntent().getIntExtra("TEAM_ID", 0);
-        teamName = getIntent().getStringExtra("TEAM_NAME");
-        teamLogoUrl = getIntent().getStringExtra("TEAM_LOGO");
+        teamId = getIntent().getIntExtra(EXTRA_TEAM_ID, 0);
+        teamName = getIntent().getStringExtra(EXTRA_TEAM_NAME);
+        teamLogoUrl = getIntent().getStringExtra(EXTRA_TEAM_LOGO);
 
         if (teamId == 0) {
             finish(); // Đóng activity nếu không có teamId
@@ -77,9 +89,7 @@ public class TeamDetailsActivity extends AppCompatActivity {
         }).attach();
 
         // 5. Observe dữ liệu từ ViewModel và truyền vào Adapter
-        viewModel.getMatchesForTeam().observe(this, matches -> {
-            pagerAdapter.setMatches(matches);
-        });
+        viewModel.getMatchesForTeam().observe(this, pagerAdapter::setMatches);
     }
 
     @Override

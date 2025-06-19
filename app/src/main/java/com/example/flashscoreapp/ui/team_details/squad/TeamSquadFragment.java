@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.flashscoreapp.R;
+// SỬA LẠI DÒNG IMPORT DƯỚI ĐÂY
 import com.example.flashscoreapp.ui.team_details.TeamDetailsViewModel;
 
 /**
@@ -66,8 +67,10 @@ public final class TeamSquadFragment extends Fragment {
             setLoadingState(false);
             if (players != null && !players.isEmpty()) {
                 recyclerView.setVisibility(View.VISIBLE);
+                emptyTextView.setVisibility(View.GONE);
                 squadAdapter.submitList(players);
             } else {
+                recyclerView.setVisibility(View.GONE);
                 emptyTextView.setVisibility(View.VISIBLE);
             }
         });

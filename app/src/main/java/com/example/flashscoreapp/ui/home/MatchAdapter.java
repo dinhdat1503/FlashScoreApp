@@ -15,6 +15,7 @@ import com.example.flashscoreapp.R;
 import com.example.flashscoreapp.data.model.domain.Match;
 import com.example.flashscoreapp.data.model.domain.Score;
 import com.example.flashscoreapp.data.model.domain.Team;
+// SỬA LẠI IMPORT ĐỂ KHỚP VỚI THƯ MỤC
 import com.example.flashscoreapp.ui.team_details.TeamDetailsActivity;
 
 import java.text.SimpleDateFormat;
@@ -54,8 +55,6 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.MatchViewHol
         boolean isFavorite = favoriteMatchIds.contains(match.getMatchId());
         holder.bind(match, isFavorite);
 
-        // --- QUAN TRỌNG: XỬ LÝ SỰ KIỆN CLICK Ở ĐÂY ---
-        // Vì onBindViewHolder không phải static, nó có thể truy cập 'listener'
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onItemClick(match);
@@ -86,7 +85,6 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.MatchViewHol
         notifyDataSetChanged();
     }
 
-    // --- ViewHolder Class ---
     public static class MatchViewHolder extends RecyclerView.ViewHolder {
         private final TextView textViewStatus, textViewLeague, textViewHomeTeam, textViewAwayTeam, textViewScore;
         private final ImageView imageViewHomeLogo, imageViewAwayLogo;
@@ -111,8 +109,7 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.MatchViewHol
             if(match.getHomeTeam() != null) textViewHomeTeam.setText(match.getHomeTeam().getName());
             if(match.getAwayTeam() != null) textViewAwayTeam.setText(match.getAwayTeam().getName());
 
-            // Logic hiển thị điểm số hoặc thời gian
-            if ("NS".equals(match.getStatus())) { // "Not Started"
+            if ("NS".equals(match.getStatus())) {
                 Calendar matchCal = Calendar.getInstance();
                 matchCal.setTimeInMillis(match.getMatchTime());
                 Calendar todayCal = Calendar.getInstance();
@@ -141,18 +138,15 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.MatchViewHol
                 }
             }
 
-            // Logic tải ảnh logo
             if(match.getHomeTeam() != null) Glide.with(itemView.getContext()).load(match.getHomeTeam().getLogoUrl()).placeholder(R.drawable.ic_leagues_24).error(R.drawable.ic_settings_24).into(imageViewHomeLogo);
             if(match.getAwayTeam() != null) Glide.with(itemView.getContext()).load(match.getAwayTeam().getLogoUrl()).placeholder(R.drawable.ic_leagues_24).error(R.drawable.ic_settings_24).into(imageViewAwayLogo);
 
-            // Logic hiển thị sao yêu thích
             if (isFavorite) {
                 imageViewFavorite.setImageResource(R.drawable.ic_star_filled);
             } else {
                 imageViewFavorite.setImageResource(R.drawable.ic_star_empty);
             }
 
-            // === THÊM LẠI LOGIC CLICK VÀO ĐỘI BÓNG ===
             final View.OnClickListener homeTeamClickListener = v -> openTeamDetails(v.getContext(), match.getHomeTeam());
             final View.OnClickListener awayTeamClickListener = v -> openTeamDetails(v.getContext(), match.getAwayTeam());
 
@@ -165,8 +159,10 @@ public class MatchAdapter extends RecyclerView.Adapter<MatchAdapter.MatchViewHol
         private void openTeamDetails(final Context context, final Team team) {
             if (team == null) return;
             final Intent intent = new Intent(context, TeamDetailsActivity.class);
+            // SỬ DỤNG HẰNG SỐ ĐÃ ĐỊNH NGHĨA
             intent.putExtra(TeamDetailsActivity.EXTRA_TEAM_ID, team.getId());
             intent.putExtra(TeamDetailsActivity.EXTRA_TEAM_NAME, team.getName());
+            intent.putExtra(TeamDetailsActivity.EXTRA_TEAM_LOGO, team.getLogoUrl());
             context.startActivity(intent);
         }
     }

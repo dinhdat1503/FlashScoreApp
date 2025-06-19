@@ -24,17 +24,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".ui.team_details.TeamDetailsActivity"
+            android:parentActivityName=".ui.MainActivity"
             android:exported="false" />
+
         <activity android:name=".ui.match_details.MatchDetailsActivity"
             android:parentActivityName=".ui.MainActivity"/>
         <activity
             android:name=".ui.settings.SettingsActivity"
             android:parentActivityName=".ui.MainActivity" />
-        <activity
-            android:name=".ui.teamdetails.TeamDetailsActivity"
-            android:parentActivityName=".ui.match_details.MatchDetailsActivity" />
+
     </application>
 
 </manifest>

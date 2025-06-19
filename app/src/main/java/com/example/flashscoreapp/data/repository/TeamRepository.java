@@ -24,8 +24,8 @@ public final class TeamRepository {
     private final ApiService apiService;
     // TODO: Thay thế các giá trị placeholder bằng API key và host thật của bạn.
     // Nên lưu trữ các giá trị này trong file build.gradle hoặc một lớp hằng số riêng.
-    private final String API_KEY = "YOUR_API_KEY_HERE";
-    private final String API_HOST = "YOUR_API_HOST_HERE";
+    private final String API_KEY = "5e88b7e40emsh79a567711143f87p119b30jsnbc4b0f951a5";
+    private final String API_HOST = "api-football-v1.p.rapidapi.com";
 
 
     public TeamRepository(final ApiService apiService) {

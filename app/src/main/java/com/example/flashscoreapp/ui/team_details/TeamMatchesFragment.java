@@ -1,4 +1,4 @@
-package com.example.flashscoreapp.ui.teamdetails;
+package com.example.flashscoreapp.ui.team_details; // Sửa lại package cho nhất quán
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -53,10 +53,19 @@ public class TeamMatchesFragment extends Fragment {
         recyclerView.setAdapter(adapter);
         adapter.setMatches(matches);
 
-        adapter.setOnItemClickListener(match -> {
-            Intent intent = new Intent(getActivity(), MatchDetailsActivity.class);
-            intent.putExtra("EXTRA_MATCH", match);
-            startActivity(intent);
+        // THAY THẾ LAMBDA BẰNG LỚP NẶC DANH
+        adapter.setOnItemClickListener(new MatchAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(Match match) {
+                Intent intent = new Intent(getActivity(), MatchDetailsActivity.class);
+                intent.putExtra("EXTRA_MATCH", match);
+                startActivity(intent);
+            }
+
+            @Override
+            public void onFavoriteClick(Match match, boolean isFavorite) {
+                // Không cần xử lý sự kiện yêu thích trong fragment này, nên để trống
+            }
         });
     }
 }
