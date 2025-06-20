@@ -16,7 +16,6 @@ import com.example.flashscoreapp.data.model.domain.League;
 import com.example.flashscoreapp.data.model.domain.Match;
 
 import java.util.ArrayList;
-import java.util.Calendar; // Thêm import này
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -67,27 +66,16 @@ public class TeamMatchesFragment extends Fragment {
             if (allMatches != null) {
                 List<Match> filteredAndSortedMatches;
 
-                // Lấy thời điểm đầu ngày hôm nay để so sánh
-                Calendar cal = Calendar.getInstance();
-                cal.set(Calendar.HOUR_OF_DAY, 0);
-                cal.set(Calendar.MINUTE, 0);
-                cal.set(Calendar.SECOND, 0);
-                cal.set(Calendar.MILLISECOND, 0);
-                long todayStartTimestamp = cal.getTimeInMillis();
-
                 if (isResults) {
-                    // Lọc và sắp xếp các trận KẾT QUẢ (gần nhất -> xa nhất)
+                    // Lọc và sắp xếp các trận KẾT QUẢ (chỉ lấy những trận đã kết thúc)
                     filteredAndSortedMatches = allMatches.stream()
                             .filter(match -> "FT".equals(match.getStatus()))
                             .sorted(Comparator.comparingLong(Match::getMatchTime).reversed())
                             .collect(Collectors.toList());
                 } else {
-                    // Lọc và sắp xếp các trận LỊCH THI ĐẤU (sắp tới -> xa hơn)
+                    // Lọc và sắp xếp các trận LỊCH THI ĐẤU (lấy tất cả những trận chưa kết thúc)
                     filteredAndSortedMatches = allMatches.stream()
-                            // Điều kiện 1: Trận đấu chưa kết thúc
                             .filter(match -> !"FT".equals(match.getStatus()))
-                            // Điều kiện 2 (MỚI): Ngày thi đấu phải từ hôm nay trở đi
-                            .filter(match -> match.getMatchTime() >= todayStartTimestamp)
                             .sorted(Comparator.comparingLong(Match::getMatchTime))
                             .collect(Collectors.toList());
                 }

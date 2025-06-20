@@ -85,4 +85,37 @@ public final class TeamRepository {
         }
         return domainList;
     }
+
+    @Nullable
+    public final Object getTeamSquad(int teamId, @NonNull Continuation<? super ApiTeamInfo> $completion) { // Thay đổi kiểu trả về nếu API trả về khác
+        return BuildersKt.withContext(Dispatchers.getIO(), new SuspendLambda<CoroutineScope, Continuation<? super ApiTeamInfo>, Object>(null) {
+            int label;
+
+            @Nullable
+            public final Object invokeSuspend(@NonNull Object $result) {
+                Object var1 = kotlin.coroutines.intrinsics.IntrinsicsKt.getCOROUTINE_SUSPENDED();
+                switch (this.label) {
+                    case 0:
+                        kotlin.ResultKt.throwOnFailure($result);
+                        this.label = 1;
+                        // Giả sử apiService.getTeamSquad trả về ApiTeamInfo hoặc một Object có thể chuyển đổi được
+                        Object response = apiService.getTeamSquad(teamId, this);
+                        return response == var1 ? var1 : (ApiTeamInfo)response; // Cast sang ApiTeamInfo hoặc kiểu thích hợp khác
+                    default:
+                        throw new IllegalStateException("call to 'resume' before 'invoke' with coroutine");
+                }
+            }
+
+            @NonNull
+            public final Continuation<Unit> create(@Nullable Object value, @NonNull Continuation<? super Unit> completion) {
+                return (Continuation<Unit>)new TeamRepository$getTeamSquad$1(TeamRepository.this, teamId, completion);
+            }
+
+            @Nullable
+            public final Object invoke(@NonNull CoroutineScope p1, @Nullable Continuation<? super ApiTeamInfo> p2) {
+                return ((TeamRepository$getTeamSquad$1)this.create(p1, p2)).invokeSuspend(Unit.INSTANCE);
+            }
+        }, $completion);
+    }
+
 }

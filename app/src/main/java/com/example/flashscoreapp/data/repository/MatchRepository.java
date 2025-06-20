@@ -61,6 +61,7 @@ public class MatchRepository {
         this.executorService = Executors.newSingleThreadExecutor();
     }
 
+    // ... (các phương thức khác giữ nguyên)
     public LiveData<List<Match>> getAllFavoriteMatches() {
         return matchDao.getAllFavoriteMatches();
     }
@@ -189,7 +190,6 @@ public class MatchRepository {
 
         for (ApiMatch apiMatch : apiMatches) {
             try {
-                // Tạo đối tượng League với đầy đủ thông tin
                 League league = new League(
                         apiMatch.getLeague().getId(),
                         apiMatch.getLeague().getName(),
@@ -197,7 +197,6 @@ public class MatchRepository {
                         apiMatch.getLeague().getCountry()
                 );
 
-                // Tạo đối tượng Team với đầy đủ thông tin
                 Team homeTeam = new Team(
                         apiMatch.getTeams().getHome().getId(),
                         apiMatch.getTeams().getHome().getName(),
@@ -213,7 +212,6 @@ public class MatchRepository {
 
                 long matchTime = sdf.parse(apiMatch.getFixture().getDate()).getTime();
 
-                // SỬA LẠI LỜI GỌI CONSTRUCTOR ĐỂ TRUYỀN ĐỦ 8 THAM SỐ
                 Match match = new Match(
                         apiMatch.getFixture().getId(),
                         league,
@@ -253,16 +251,11 @@ public class MatchRepository {
 
     public LiveData<List<Match>> getResultsForLeague(int leagueId, int seasonYear) {
         final MutableLiveData<List<Match>> data = new MutableLiveData<>();
-
-        // Gọi đến endpoint "fixtures" với các tham số league và season
-        // Ta truyền null cho fixtureId vì không cần tìm theo trận đấu cụ thể
         apiService.getFixtures(null, leagueId, seasonYear, API_KEY, API_HOST).enqueue(new Callback<ApiResponse<ApiMatch>>() {
             @Override
             public void onResponse(Call<ApiResponse<ApiMatch>> call, Response<ApiResponse<ApiMatch>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<Match> allMatches = convertApiMatchesToDomain(response.body().getResponse());
-
-                    // Lọc ra các trận đã kết thúc (có trạng thái là "FT" - Full Time)
                     List<Match> finishedMatches = allMatches.stream()
                             .filter(match -> "FT".equals(match.getStatus()))
                             .collect(Collectors.toList());
@@ -289,10 +282,7 @@ public class MatchRepository {
                         && !response.body().getResponse().isEmpty()
                         && response.body().getResponse().get(0).getLeague() != null
                         && !response.body().getResponse().get(0).getLeague().getStandings().isEmpty()) {
-
-                    // Lấy về toàn bộ danh sách các bảng đấu
-                    List<List<StandingItem>> allStandings = response.body().getResponse().get(0).getLeague().getStandings();
-                    data.postValue(allStandings);
+                    data.postValue(response.body().getResponse().get(0).getLeague().getStandings());
                 } else {
                     data.postValue(null);
                 }
@@ -326,7 +316,6 @@ public class MatchRepository {
 
     public LiveData<List<Match>> getLiveMatchesFromApi() {
         final MutableLiveData<List<Match>> data = new MutableLiveData<>();
-        // Gọi API với tham số live=all để lấy tất cả các trận đang diễn ra
         apiService.getLiveFixtures("all", API_KEY, API_HOST).enqueue(new Callback<ApiResponse<ApiMatch>>() {
             @Override
             public void onResponse(Call<ApiResponse<ApiMatch>> call, Response<ApiResponse<ApiMatch>> response) {
@@ -365,11 +354,10 @@ public class MatchRepository {
     }
 
     // --- PHẦN ĐƯỢC SỬA ---
-    // Thay thế seasonYear bằng fromDate và toDate
-    public LiveData<List<Match>> getMatchesForTeam(int teamId, String fromDate, String toDate) {
+    public LiveData<List<Match>> getMatchesForTeam(int teamId, int season) {
         final MutableLiveData<List<Match>> data = new MutableLiveData<>();
         // Gọi đến ApiService đã được cập nhật
-        apiService.getFixturesForTeam(teamId, fromDate, toDate, API_KEY, API_HOST).enqueue(new Callback<ApiResponse<ApiMatch>>() {
+        apiService.getFixturesForTeam(teamId, season, API_KEY, API_HOST).enqueue(new Callback<ApiResponse<ApiMatch>>() {
             @Override
             public void onResponse(Call<ApiResponse<ApiMatch>> call, Response<ApiResponse<ApiMatch>> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -385,4 +373,6 @@ public class MatchRepository {
         });
         return data;
     }
+
+
 }
